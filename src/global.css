@@ -1,0 +1,29 @@
+main {
+    width: 100%;
+    max-width: 800px; /* Maximum width of the table */
+    margin: auto; /* Center the table horizontally */
+    border-collapse: collapse;
+  }
+  table {
+    width: 100%;
+    max-width: 800px; /* Maximum width of the table */
+    margin: auto; /* Center the table horizontally */
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    background-color: #f0f0f0; /* Slightly darker background for the header */
+  }
+  th:last-child {
+    text-align: right; /* Align "Record Count" header to the right */
+  }
+  td:last-child {
+    text-align: right; /* Align record count to the right */
+  }
+  th, td:first-child {
+    font-weight: bold;
+  }

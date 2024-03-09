@@ -1,7 +1,11 @@
 <script>
+    import Modal from './Modal.svelte';
     export let recordType;
     export let correctScreenshotPath;
   
+    let showModal = false; // State to control the visibility of the modal
+    let modalImageSrc = ''; // State to hold the current image src for the modal
+
     const recordTypeMap = {
       "completed_at_difficulty": "Difficulty",
       "high_score": "Score",
@@ -11,7 +15,16 @@
     };
   
     const recordTypeToValue = (type) => recordTypeMap[type] || "";
-  </script>
+
+    const showScreenshotModal = (screenshotPath) => {
+        modalImageSrc = correctScreenshotPath(screenshotPath);
+        showModal = true;
+    };
+
+    function closeModal() {
+      showModal = false;
+    }
+</script>
   
   <h2>{recordType.name}</h2>
   {#if recordType.description}
@@ -32,7 +45,7 @@
         <td>{record.date}</td>
         <td>
           {#if record.screenshot}
-          <a href={correctScreenshotPath(record.screenshot)} target="_blank">View</a>
+          <button on:click={() => showScreenshotModal(record.screenshot)}>View</button>
           {:else}
           <span style="color: #ccc;">-</span>
           {/if}
@@ -42,3 +55,4 @@
     </tbody>
   </table>
   
+  <Modal isVisible={showModal} imgSrc={modalImageSrc} onClose={closeModal}/>

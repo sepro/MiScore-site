@@ -7,7 +7,7 @@
   {#if isVisible}
   <div class="modal">
     <div class="modal-content">
-      <span class="close" on:click={onClose}>&times;</span>
+      <span class="close" on:click={onClose} on:keydown={onClose}>&times;</span>
       <img src={imgSrc} alt="Screenshot">
     </div>
   </div>
@@ -55,6 +55,7 @@
 
         /* Style for the image to make it responsive */
         .modal-content img {
+        width: max-content;
         max-width: 100%;
         height: auto;
         }

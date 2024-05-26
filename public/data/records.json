@@ -310,6 +310,108 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Hogwarts Legacy",
+      "difficulties": [
+        "Story",
+        "Easy",
+        "Normal",
+        "Hard"
+      ],
+      "record_types": [
+        {
+          "name": "Completed Game",
+          "description": "Finish the main game at a specific difficulty",
+          "type": "completed_at_difficulty",
+          "records": [
+            {
+              "difficulty": "Hard",
+              "date": "2024-03-02",
+              "screenshot": "./screenshots/hogwarts_legacy/hogwarts_legacy_hard_20240302.jpg",
+              "description": "First playthrough, as Slytheryn, with a focus on ancient magic and unforgivable curses."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Half-Life: Alyx",
+      "difficulties": [
+        "Story",
+        "Easy",
+        "Normal",
+        "Hard"
+      ],
+      "record_types": [
+        {
+          "name": "Completed Game",
+          "description": "Finish the main game at a specific difficulty",
+          "type": "completed_at_difficulty",
+          "records": [
+            {
+              "difficulty": "Normal",
+              "date": "2024-03-03",
+              "description": "With NoVR Launcher to play the game without a VR headset."
+            }
+          ]
+        }
+      ]
+    },
+    {
+    "name": "Virtual Boy Wario Land",
+    "record_types": [
+        {
+            "name": "Coins Collected",
+            "description": "Collect as many coins as possible and complete the game",
+            "type": "high_score",
+            "records": [
+                {
+                    "score": "4835",
+                    "date": "2024-03-15",
+                    "screenshot": "./screenshots/virtualboy_warioland/20240315_warioland.png",
+                    "description": "First time finishing this game."
+                }
+            ]
+        },
+        {
+            "name": "Fastest Finish",
+            "description": "Complete the game as fast as possible",
+            "type": "fastest_time",
+            "records": [
+                {
+                    "time": "03:24:05",
+                    "date": "2024-03-15",
+                    "screenshot": "./screenshots/virtualboy_warioland/20240315_warioland.png",
+                    "description": "First time finishing this game."
+                }
+            ]
+        }
+    ]
+},
+    {
+  "name": "Titanfall 2",
+  "difficulties": [
+    "Easy",
+    "Regular",
+    "Hard",
+    "Master"
+  ],
+  "record_types": [
+    {
+      "name": "Completed Game",
+      "description": "Finish the game at a specific difficulty",
+      "type": "completed_at_difficulty",
+      "records": [
+        {
+          "difficulty": "Hard",
+          "date": "2024-05-25",
+          "screenshot": "./screenshots/titanfall_2/titanfall_2_hard_20240525.jpg"
+        }
+      ]
     }
+  ]
+}
+
   ]
 }

@@ -4,12 +4,15 @@
   import Home from './routes/Home.svelte'
 
   import { onMount } from 'svelte';
-  import { gameRecords } from './stores.js'
+  import { gameRecords, isLoading } from './stores.js'
+
+
 
   onMount(async () => {
       const response = await fetch('/data/records.json');
       const data = await response.json();
       $gameRecords = data.games;
+      isLoading.set(false);
     });
 </script>
 
@@ -18,10 +21,14 @@
     <Link to="/">Home</Link>
   </nav>
   <div>
-    <Route path="/" component={Home} />
-    <Route path="/game/:id" let:params>
-      <GameDetails id="{params.id}" />
-    </Route>  
+    {#if $isLoading}
+      <p>Loading...</p>
+    {:else}
+      <Route path="/" component={Home} />
+      <Route path="/game/:id" let:params>
+        <GameDetails id={params.id} />
+      </Route>
+    {/if}
   </div>
 </Router>
 

@@ -6,10 +6,8 @@
   import { onMount } from 'svelte';
   import { gameRecords, isLoading } from './stores.js'
 
-
-
   onMount(async () => {
-      const response = await fetch('/data/records.json');
+      const response = await fetch('/records/data/records.json');
       const data = await response.json();
       $gameRecords = data.games;
       isLoading.set(false);

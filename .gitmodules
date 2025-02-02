@@ -1,0 +1,3 @@
+[submodule "public/records"]
+	path = public/records
+	url = https://github.com/sepro/MiScore-data

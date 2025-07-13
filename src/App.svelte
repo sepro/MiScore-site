@@ -16,14 +16,14 @@
 
 <Router>
   <nav>
-    <Link to="/">Home</Link>
+    <Link to="./">Home</Link>
   </nav>
   <div>
     {#if $isLoading}
       <p>Loading...</p>
     {:else}
-      <Route path="/" component={Home} />
-      <Route path="/game/:id" let:params>
+      <Route path="./" component={Home} />
+      <Route path="./game/:id" let:params>
         <GameDetails id={params.id} />
       </Route>
     {/if}

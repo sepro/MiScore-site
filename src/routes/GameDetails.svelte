@@ -8,7 +8,7 @@
 
     $: gameData = $gameRecords[id];
   
-    const correctScreenshotPath = (path) => path && !path.startsWith('/records/data/') ? `/records/data/${path}` : path;
+    const correctScreenshotPath = (path) => path && !path.startsWith('./records/data/') ? `./records/data/${path}` : path;
   </script>
   
   <main>

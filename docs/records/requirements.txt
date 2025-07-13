@@ -1,0 +1,1 @@
+miscore @ https://github.com/sepro/MiScore/archive/refs/heads/main.zip

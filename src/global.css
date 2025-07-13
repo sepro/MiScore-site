@@ -27,3 +27,12 @@ main {
   th, td:first-child {
     font-weight: bold;
   }
+
+div.screenshot-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+img.screenshot {
+  max-height: 80vh;
+}

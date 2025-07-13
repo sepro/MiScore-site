@@ -8,7 +8,9 @@
   <div class="modal">
     <div class="modal-content">
       <span class="close" on:click={onClose} on:keydown={onClose}>&times;</span>
-      <img src={imgSrc} alt="Screenshot">
+      <div class="screenshot-wrapper">
+        <img src={imgSrc} alt="Screenshot" class="screenshot" />
+      </div>
     </div>
   </div>
   {/if}

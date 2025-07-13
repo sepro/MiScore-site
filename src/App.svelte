@@ -7,7 +7,7 @@
   import { gameRecords, isLoading } from './stores.js'
 
   onMount(async () => {
-      const response = await fetch('./records/data/records.json');
+      const response = await fetch('/records/data/records.json');
       const data = await response.json();
       $gameRecords = data.games;
       isLoading.set(false);
@@ -16,14 +16,14 @@
 
 <Router>
   <nav>
-    <Link to="./">Home</Link>
+    <Link to="/">Home</Link>
   </nav>
   <div>
     {#if $isLoading}
       <p>Loading...</p>
     {:else}
-      <Route path="./" component={Home} />
-      <Route path="./game/:id" let:params>
+      <Route path="/" component={Home} />
+      <Route path="/game/:id" let:params>
         <GameDetails id={params.id} />
       </Route>
     {/if}

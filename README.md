@@ -5,7 +5,9 @@
 Install the dependencies...
 
 ```bash
+git clone https://github.com/sepro/MiScore-site miscore-website
 cd miscore-website
+git submodule update --init
 npm install
 ```
 

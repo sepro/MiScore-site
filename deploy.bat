@@ -1,2 +1,2 @@
 npm run build
-cp -r public/* docs//
+cp -r .\public\* .\docs\

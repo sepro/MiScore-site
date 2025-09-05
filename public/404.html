@@ -8,34 +8,57 @@
     // This script takes the current 404 path and converts it to a hash-based route
     // that the SPA router can handle
     
-    var pathSegments = window.location.pathname.slice(1).split('/');
-    var basePath = '';
+    // Get the full current path
+    var currentPath = window.location.pathname;
+    var search = window.location.search;
     
-    // Handle subfolder deployments (if BASE_URL is set)
-    if (window.location.pathname.startsWith('/MiScore-site/')) {
-      basePath = '/MiScore-site';
-      pathSegments = window.location.pathname.slice('/MiScore-site/'.length).split('/');
+    // Detect if we're in a subdirectory by checking for common GitHub Pages patterns
+    // or if the URL contains a path that doesn't match our known routes
+    var basePath = '';
+    var routePath = currentPath;
+    
+    // Common GitHub Pages subdirectory patterns
+    var repoPatterns = [
+      /^\/([a-zA-Z0-9_-]+site)\/(.*)$/, // Matches /something-site/... or /somethingsite/...
+      /^\/([a-zA-Z0-9_-]+)\/(.*)$/      // General repo pattern /repo-name/...
+    ];
+    
+    for (var i = 0; i < repoPatterns.length; i++) {
+      var match = currentPath.match(repoPatterns[i]);
+      if (match && match[1]) {
+        // Check if this looks like a known repository name pattern
+        var possibleRepo = match[1].toLowerCase();
+        if (possibleRepo.includes('miscore') || possibleRepo.includes('site') || possibleRepo.includes('-')) {
+          basePath = '/' + match[1];
+          routePath = '/' + (match[2] || '');
+          break;
+        }
+      }
     }
     
-    if (pathSegments.length > 0 && pathSegments[0] !== '') {
-      // Convert /game/batman-arkham-shadow to /#/game/batman-arkham-shadow
+    // Clean up the route path
+    if (routePath === '/' || routePath === '') {
+      // Home page redirect
+      window.location.replace(
+        window.location.protocol + '//' + 
+        window.location.hostname + 
+        (window.location.port ? ':' + window.location.port : '') + 
+        basePath + 
+        '/' + search
+      );
+    } else {
+      // Convert route to hash-based routing
+      // Remove leading slash from routePath for hash
+      var hashPath = routePath.startsWith('/') ? routePath.slice(1) : routePath;
+      
       window.location.replace(
         window.location.protocol + '//' + 
         window.location.hostname + 
         (window.location.port ? ':' + window.location.port : '') + 
         basePath + 
         '/#/' + 
-        pathSegments.join('/') + 
-        window.location.search
-      );
-    } else {
-      // Redirect to home page
-      window.location.replace(
-        window.location.protocol + '//' + 
-        window.location.hostname + 
-        (window.location.port ? ':' + window.location.port : '') + 
-        basePath + 
-        '/'
+        hashPath + 
+        search
       );
     }
   </script>
@@ -43,7 +66,7 @@
 <body>
   <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
     <h2>Redirecting...</h2>
-    <p>If you are not redirected automatically, <a href="/">click here to go to the homepage</a>.</p>
+    <p>If you are not redirected automatically, <a href="./">click here to go to the homepage</a>.</p>
   </div>
 </body>
 </html>

@@ -208,13 +208,14 @@
                   <span>📷</span>
                   View Screenshot
                 </button>
-              {:else}
-                <span class="no-screenshot">No image</span>
               {/if}
               {#if record.description}
                 <button class="description-toggle" on:click={() => toggleDescription(index)}>
                   {expandedDescriptions.has(index) ? '▼' : '▶'} Description
                 </button>
+              {/if}
+              {#if !record.screenshot && !record.description}
+                <span class="no-details">No details</span>
               {/if}
             </div>
           </td>
@@ -379,7 +380,7 @@
       font-size: 1rem;
     }
 
-    .no-screenshot {
+    .no-details {
       color: var(--text-muted);
       font-size: 0.85rem;
       font-style: italic;

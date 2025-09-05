@@ -4,11 +4,19 @@
   import Home from './routes/Home.svelte'
 
   import { onMount } from 'svelte';
-  import { gameRecords, isLoading, basePath } from './stores.js'
+  import { gameRecords, isLoading, basePath, createSlug } from './stores.js'
 
   onMount(async () => {
       console.log('App.svelte: onMount started');
       console.log('App.svelte: basePath:', $basePath);
+      
+      // Handle hash-based redirects from 404.html
+      if (window.location.hash && window.location.hash.startsWith('#/')) {
+        const hashPath = window.location.hash.slice(1);
+        console.log('App.svelte: Detected hash redirect, navigating to:', hashPath);
+        // Remove hash and use regular routing
+        window.history.replaceState(null, '', `${$basePath}${hashPath}`);
+      }
       
       const url = `${$basePath}/records/data/records.json`;
       console.log('App.svelte: attempting to fetch from:', url);
@@ -26,8 +34,15 @@
         console.log('App.svelte: parsed JSON data:', data);
         console.log('App.svelte: games array length:', data.games?.length || 'undefined');
         
-        $gameRecords = data.games;
-        console.log('App.svelte: gameRecords store updated');
+        // Add slugs to game data
+        const gamesWithSlugs = data.games.map((game, index) => ({
+          ...game,
+          slug: createSlug(game.name),
+          originalIndex: index // Keep for backward compatibility if needed
+        }));
+        
+        $gameRecords = gamesWithSlugs;
+        console.log('App.svelte: gameRecords store updated with slugs');
         
         isLoading.set(false);
         console.log('App.svelte: loading state set to false');
@@ -65,8 +80,8 @@
       </div>
     {:else}
       <Route path="/" component={Home} />
-      <Route path="/game/:id" let:params>
-        <GameDetails id={params.id} />
+      <Route path="/game/:slug" let:params>
+        <GameDetails slug={params.slug} />
       </Route>
     {/if}
   </main>

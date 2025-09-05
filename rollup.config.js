@@ -25,12 +25,18 @@ function processHtml() {
 			html = html.replace(/href='[^']*\/build\/bundle\.css'/g, `href='./build/bundle.css'`);
 			html = html.replace(/src='[^']*\/build\/bundle\.js'/g, `src='./build/bundle.js'`);
 			
-			// Then apply BASE_URL if provided
+			// Apply BASE_URL if provided, otherwise use absolute paths for SPA routing
 			if (baseUrl) {
 				html = html.replace(/href='\.\/favicon\.png'/g, `href='${baseUrl}/favicon.png'`);
 				html = html.replace(/href='\.\/global\.css'/g, `href='${baseUrl}/global.css'`);
 				html = html.replace(/href='\.\/build\/bundle\.css'/g, `href='${baseUrl}/build/bundle.css'`);
 				html = html.replace(/src='\.\/build\/bundle\.js'/g, `src='${baseUrl}/build/bundle.js'`);
+			} else {
+				// Use absolute paths for local development to support direct URL access
+				html = html.replace(/href='\.\/favicon\.png'/g, `href='/favicon.png'`);
+				html = html.replace(/href='\.\/global\.css'/g, `href='/global.css'`);
+				html = html.replace(/href='\.\/build\/bundle\.css'/g, `href='/build/bundle.css'`);
+				html = html.replace(/src='\.\/build\/bundle\.js'/g, `src='/build/bundle.js'`);
 			}
 			
 			writeFileSync(htmlPath, html);

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // GitHub Pages 404 to SPA redirect
+    // This script takes the current 404 path and converts it to a hash-based route
+    // that the SPA router can handle
+    
+    var pathSegments = window.location.pathname.slice(1).split('/');
+    var basePath = '';
+    
+    // Handle subfolder deployments (if BASE_URL is set)
+    if (window.location.pathname.startsWith('/MiScore-site/')) {
+      basePath = '/MiScore-site';
+      pathSegments = window.location.pathname.slice('/MiScore-site/'.length).split('/');
+    }
+    
+    if (pathSegments.length > 0 && pathSegments[0] !== '') {
+      // Convert /game/batman-arkham-shadow to /#/game/batman-arkham-shadow
+      window.location.replace(
+        window.location.protocol + '//' + 
+        window.location.hostname + 
+        (window.location.port ? ':' + window.location.port : '') + 
+        basePath + 
+        '/#/' + 
+        pathSegments.join('/') + 
+        window.location.search
+      );
+    } else {
+      // Redirect to home page
+      window.location.replace(
+        window.location.protocol + '//' + 
+        window.location.hostname + 
+        (window.location.port ? ':' + window.location.port : '') + 
+        basePath + 
+        '/'
+      );
+    }
+  </script>
+</head>
+<body>
+  <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+    <h2>Redirecting...</h2>
+    <p>If you are not redirected automatically, <a href="/">click here to go to the homepage</a>.</p>
+  </div>
+</body>
+</html>

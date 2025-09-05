@@ -6,10 +6,10 @@
     let records = [];
 
     function aggregateRecords(games) {
-      return games.map((game, index) => ({
+      return games.map((game) => ({
         name: game.name,
-        recordCount: game.record_types.reduce((sum, type) => sum + type.records.length, 0),
-        originalIndex: index
+        slug: game.slug,
+        recordCount: game.record_types.reduce((sum, type) => sum + type.records.length, 0)
       })).sort((a, b) => {
         const nameA = a.name.replace(/^The /i, '');
         const nameB = b.name.replace(/^The /i, '');
@@ -34,7 +34,7 @@
       <tbody>
         {#each records as game}
           <tr>
-            <td><Link to="{$basePath}/game/{game.originalIndex}">{game.name}</Link></td>
+            <td><Link to="{$basePath}/game/{game.slug}">{game.name}</Link></td>
             <td>{game.recordCount}</td>
           </tr>
         {/each}

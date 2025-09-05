@@ -1,13 +1,15 @@
 <script>
     import '../global.css';
     import { Link } from 'svelte-routing';
-    import { gameRecords, basePath } from '../stores.js';
+    import { gameRecords, basePath, isLoading } from '../stores.js';
     import RecordType from '../components/RecordType.svelte';
   
-    export let id;
-    let gameData = {};
+    export let slug;
+    let gameData = null;
 
-    $: gameData = $gameRecords[id];
+    $: gameData = $gameRecords.find(game => game.slug === slug);
+    $: isDataLoaded = $gameRecords.length > 0;
+    $: isValidGame = isDataLoaded && gameData;
   
     const correctScreenshotPath = (path) => {
         if (!path) return path;
@@ -26,33 +28,45 @@
       </Link>
     </div>
     
-    <div class="game-header">
-      <h1>{gameData?.name || 'Loading...'}</h1>
-      {#if totalRecords > 0}
-        <div class="game-stats">
-          <div class="stat-card">
-            <span class="stat-number">{totalRecords}</span>
-            <span class="stat-label">Total {totalRecords === 1 ? 'Record' : 'Records'}</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">{gameData.record_types?.length || 0}</span>
-            <span class="stat-label">{(gameData.record_types?.length || 0) === 1 ? 'Record Type' : 'Record Types'}</span>
-          </div>
+    {#if $isLoading || !isDataLoaded}
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading game data...</p>
+      </div>
+    {:else if !isValidGame}
+      <div class="error-page">
+        <h1>Game Not Found</h1>
+        <p>The game "<strong>{slug}</strong>" could not be found.</p>
+        <div class="error-actions">
+          <Link to="{$basePath}/" class="error-link">
+            <span>🏠</span>
+            Browse All Games
+          </Link>
         </div>
-      {/if}
-    </div>
+      </div>
+    {:else}
+      <div class="game-header">
+        <h1>{gameData.name}</h1>
+        {#if totalRecords > 0}
+          <div class="game-stats">
+            <div class="stat-card">
+              <span class="stat-number">{totalRecords}</span>
+              <span class="stat-label">Total {totalRecords === 1 ? 'Record' : 'Records'}</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">{gameData.record_types?.length || 0}</span>
+              <span class="stat-label">{(gameData.record_types?.length || 0) === 1 ? 'Record Type' : 'Record Types'}</span>
+            </div>
+          </div>
+        {/if}
+      </div>
 
-    {#if gameData?.record_types}
       <div class="records-container">
         {#each gameData.record_types as recordType}
           <div class="record-section">
             <RecordType {recordType} {correctScreenshotPath} gameData={gameData} />
           </div>
         {/each}
-      </div>
-    {:else}
-      <div class="loading">
-        <p>Loading game data...</p>
       </div>
     {/if}
   </main>
@@ -135,6 +149,88 @@
       letter-spacing: 0.05em;
       font-weight: 600;
       margin-top: var(--spacing-sm);
+    }
+
+    /* Loading State */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+      gap: var(--spacing-lg);
+    }
+
+    .loading p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--surface-light);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Error Page */
+    .error-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+      text-align: center;
+      gap: var(--spacing-lg);
+    }
+
+    .error-page h1 {
+      color: var(--danger-color);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .error-page p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .error-actions {
+      margin-top: var(--spacing-lg);
+    }
+
+    :global(.error-link) {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      background: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+
+    :global(.error-link:hover) {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-glow);
+      text-decoration: none;
+    }
+
+    :global(.error-link span) {
+      font-size: 1.2rem;
     }
 
     /* Records Container */

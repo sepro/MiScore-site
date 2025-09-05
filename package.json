@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rollup -c",
     "build:subfolder": "BASE_URL=/MiScore-site rollup -c",
-    "dev": "rollup -c -w",
+    "dev": "rollup -c -w & sirv public --single --dev --port 8080",
     "dev:subfolder": "BASE_URL=/MiScore-site rollup -c -w",
     "start": "sirv public --no-clear --single --port 8081 --host",
     "start:subfolder": "sirv public --no-clear --single --port 8081 --host --base /MiScore-site"

@@ -1,5 +1,5 @@
 <script>
-    import { onMount, onDestroy, tick } from 'svelte';
+    import { onMount, onDestroy, afterUpdate } from 'svelte';
     
     export let isVisible = false;
     export let imgSrc = '';
@@ -26,12 +26,14 @@
     });
 
     // Move modal to portal when it becomes visible
-    $: if (isVisible && modalElement && portal) {
-        portal.appendChild(modalElement);
-    } else if (!isVisible && modalElement && modalElement.parentNode === portal) {
-        // Move it back to the original location when hidden
-        portal.removeChild(modalElement);
-    }
+    afterUpdate(() => {
+        if (isVisible && modalElement && portal && modalElement.parentNode !== portal) {
+            portal.appendChild(modalElement);
+        } else if (!isVisible && modalElement && modalElement.parentNode === portal) {
+            // Move it back to the original location when hidden
+            portal.removeChild(modalElement);
+        }
+    });
 
     // Handle ESC key to close modal
     function handleKeydown(event) {
@@ -59,6 +61,8 @@
   <svelte:window on:keydown={handleKeydown} />
   
   {#if isVisible}
+  <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
   <div 
     class="modal" 
     bind:this={modalElement}
@@ -67,6 +71,7 @@
     role="dialog"
     aria-modal="true"
     aria-label="Screenshot viewer"
+    tabindex="0"
   >
     <div class="modal-content">
       <button 

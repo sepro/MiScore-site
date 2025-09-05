@@ -5,10 +5,9 @@
     import RecordType from '../components/RecordType.svelte';
   
     export let slug;
-    let gameData = null;
-
-    $: gameData = $gameRecords.find(game => game.slug === slug);
-    $: isDataLoaded = $gameRecords.length > 0;
+    
+    $: gameData = $gameRecords && Array.isArray($gameRecords) ? $gameRecords.find(game => game.slug === slug) : null;
+    $: isDataLoaded = $gameRecords && Array.isArray($gameRecords) && $gameRecords.length > 0;
     $: isValidGame = isDataLoaded && gameData;
   
     const correctScreenshotPath = (path) => {
@@ -18,7 +17,7 @@
     };
 
     // Calculate total records
-    $: totalRecords = gameData?.record_types?.reduce((sum, type) => sum + type.records.length, 0) || 0;
+    $: totalRecords = gameData?.record_types?.reduce((sum, type) => sum + (type.records?.length || 0), 0) || 0;
   </script>
   
   <main>

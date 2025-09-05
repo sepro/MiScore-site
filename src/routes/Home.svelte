@@ -3,13 +3,13 @@
     import { Link } from 'svelte-routing';
     import { gameRecords, basePath } from '../stores.js'
 
-    let records = [];
-
     function aggregateRecords(games) {
+      if (!games || !Array.isArray(games)) return [];
+      
       return games.map((game) => ({
         name: game.name,
         slug: game.slug,
-        recordCount: game.record_types.reduce((sum, type) => sum + type.records.length, 0)
+        recordCount: game.record_types?.reduce((sum, type) => sum + (type.records?.length || 0), 0) || 0
       })).sort((a, b) => {
         const nameA = a.name.replace(/^The /i, '');
         const nameB = b.name.replace(/^The /i, '');
@@ -17,9 +17,7 @@
       });
     }
 
-    $: {
-        records = aggregateRecords($gameRecords)
-    }
+    $: records = aggregateRecords($gameRecords);
 </script>
 
 <main>

@@ -33,6 +33,28 @@ npm run build
 
 You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
 
+### Building for deployment in a subfolder
+
+If you need to deploy the app to a subfolder (e.g., `https://example.com/myapp/`), use the subfolder build command:
+
+```bash
+npm run build:subfolder
+```
+
+This builds the app with `BASE_URL=/myapp`, ensuring all asset paths and navigation work correctly when hosted in the `/myapp` subfolder. You can also set a custom subfolder path:
+
+```bash
+BASE_URL=/your-subfolder npm run build
+```
+
+To test the subfolder build locally:
+
+```bash
+npm run test:subfolder
+```
+
+This serves the built app at `http://localhost:8081/myapp/` to verify everything works correctly.
+
 
 ## Single-page app mode
 

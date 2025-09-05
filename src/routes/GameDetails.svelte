@@ -1,6 +1,6 @@
 <script>
     import '../global.css';
-    import { gameRecords } from '../stores.js';
+    import { gameRecords, basePath } from '../stores.js';
     import RecordType from '../components/RecordType.svelte';
   
     export let id;
@@ -8,7 +8,11 @@
 
     $: gameData = $gameRecords[id];
   
-    const correctScreenshotPath = (path) => path && !path.startsWith('/records/data/') ? `/records/data/${path}` : path;
+    const correctScreenshotPath = (path) => {
+        if (!path) return path;
+        const fullPath = path.startsWith('/records/data/') ? path : `/records/data/${path}`;
+        return `${$basePath}${fullPath}`;
+    };
   </script>
   
   <main>

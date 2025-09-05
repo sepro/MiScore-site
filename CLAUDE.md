@@ -10,7 +10,7 @@ MiScore Website is a Svelte-based single-page application that displays gaming r
 
 - `npm run dev` - Start development server with hot reload (default port: 8080)
 - `npm run build` - Create production build in `public/build/`
-- `npm run start` - Serve production build locally
+- `npm run start` - Serve production build locally on port 8081
 
 ## Architecture
 

@@ -1,7 +1,7 @@
 <script>
     import '../global.css';
     import { Link } from 'svelte-routing';
-    import { gameRecords } from '../stores.js'
+    import { gameRecords, basePath } from '../stores.js'
 
     let records = [];
 
@@ -29,7 +29,7 @@
       <tbody>
         {#each records as game, gameIdx}
           <tr>
-            <td><Link to="/game/{gameIdx}">{game.name}</Link></td>
+            <td><Link to="{$basePath}/game/{gameIdx}">{game.name}</Link></td>
             <td>{game.recordCount}</td>
           </tr>
         {/each}

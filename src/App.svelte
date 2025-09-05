@@ -4,17 +4,42 @@
   import Home from './routes/Home.svelte'
 
   import { onMount } from 'svelte';
-  import { gameRecords, isLoading } from './stores.js'
+  import { gameRecords, isLoading, basePath } from './stores.js'
 
   onMount(async () => {
-      const response = await fetch('/records/data/records.json');
-      const data = await response.json();
-      $gameRecords = data.games;
-      isLoading.set(false);
+      console.log('App.svelte: onMount started');
+      console.log('App.svelte: basePath:', $basePath);
+      
+      const url = `${$basePath}/records/data/records.json`;
+      console.log('App.svelte: attempting to fetch from:', url);
+      
+      try {
+        const response = await fetch(url);
+        console.log('App.svelte: fetch response status:', response.status);
+        console.log('App.svelte: fetch response ok:', response.ok);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('App.svelte: parsed JSON data:', data);
+        console.log('App.svelte: games array length:', data.games?.length || 'undefined');
+        
+        $gameRecords = data.games;
+        console.log('App.svelte: gameRecords store updated');
+        
+        isLoading.set(false);
+        console.log('App.svelte: loading state set to false');
+      } catch (error) {
+        console.error('App.svelte: Error loading records:', error);
+        isLoading.set(false);
+        console.log('App.svelte: loading state set to false due to error');
+      }
     });
 </script>
 
-<Router>
+<Router basepath={$basePath}>
   <nav>
     <Link to="/">Home</Link>
   </nav>

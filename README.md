@@ -84,6 +84,20 @@ If you want to use `baseUrl` or `path` aliases within your `tsconfig`, you need 
 
 ## Deploying to the web
 
+### GitHub Pages (Automatic Deployment)
+
+This repository is configured for automatic deployment to GitHub Pages. When you push to the `main` branch, a GitHub Action will:
+
+1. Build the app with `BASE_URL=/MiScore-site` for the GitHub Pages subfolder
+2. Deploy the built site to GitHub Pages
+
+The deployed site will be available at: `https://sepro.github.io/MiScore-site/`
+
+To enable GitHub Pages:
+1. Go to your repository Settings → Pages
+2. Set Source to "GitHub Actions"
+3. Push to the `main` branch to trigger deployment
+
 ### With [Vercel](https://vercel.com)
 
 Install `vercel` if you haven't already:

@@ -17,23 +17,13 @@
     var basePath = '';
     var routePath = currentPath;
     
-    // Common GitHub Pages subdirectory patterns
-    var repoPatterns = [
-      /^\/([a-zA-Z0-9_-]+site)\/(.*)$/, // Matches /something-site/... or /somethingsite/...
-      /^\/([a-zA-Z0-9_-]+)\/(.*)$/      // General repo pattern /repo-name/...
-    ];
-    
-    for (var i = 0; i < repoPatterns.length; i++) {
-      var match = currentPath.match(repoPatterns[i]);
-      if (match && match[1]) {
-        // Check if this looks like a known repository name pattern
-        var possibleRepo = match[1].toLowerCase();
-        if (possibleRepo.includes('miscore') || possibleRepo.includes('site') || possibleRepo.includes('-')) {
-          basePath = '/' + match[1];
-          routePath = '/' + (match[2] || '');
-          break;
-        }
-      }
+    // GitHub Pages repository pattern - specifically handle MiScore-site
+    var repoMatch = currentPath.match(/^\/([^\/]+)\/(.*)$/);
+    if (repoMatch && repoMatch[1]) {
+      var repoName = repoMatch[1];
+      // For GitHub Pages, assume first path segment is the repository name
+      basePath = '/' + repoName;
+      routePath = '/' + (repoMatch[2] || '');
     }
     
     // Clean up the route path

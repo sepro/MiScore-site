@@ -19,7 +19,13 @@ function processHtml() {
 			const htmlPath = 'public/index.html';
 			let html = readFileSync(htmlPath, 'utf8');
 			
-			// Replace asset paths with BASE_URL prefixed paths
+			// First, reset all asset paths to relative paths (remove any existing BASE_URL)
+			html = html.replace(/href='[^']*\/favicon\.png'/g, `href='./favicon.png'`);
+			html = html.replace(/href='[^']*\/global\.css'/g, `href='./global.css'`);
+			html = html.replace(/href='[^']*\/build\/bundle\.css'/g, `href='./build/bundle.css'`);
+			html = html.replace(/src='[^']*\/build\/bundle\.js'/g, `src='./build/bundle.js'`);
+			
+			// Then apply BASE_URL if provided
 			if (baseUrl) {
 				html = html.replace(/href='\.\/favicon\.png'/g, `href='${baseUrl}/favicon.png'`);
 				html = html.replace(/href='\.\/global\.css'/g, `href='${baseUrl}/global.css'`);

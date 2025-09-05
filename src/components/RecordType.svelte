@@ -6,6 +6,7 @@
   
     let showModal = false; // State to control the visibility of the modal
     let modalImageSrc = ''; // State to hold the current image src for the modal
+    let expandedDescriptions = new Set(); // Track which record descriptions are expanded
 
     const recordTypeMap = {
       "completed_at_difficulty": "Difficulty",
@@ -24,6 +25,15 @@
 
     function closeModal() {
       showModal = false;
+    }
+
+    function toggleDescription(index) {
+      if (expandedDescriptions.has(index)) {
+        expandedDescriptions.delete(index);
+      } else {
+        expandedDescriptions.add(index);
+      }
+      expandedDescriptions = expandedDescriptions; // Trigger reactivity
     }
 
     // Function to determine if a record is the "best" one
@@ -174,7 +184,7 @@
             <th>{recordTypeToValue(recordType.type)}</th>
           {/if}
           <th>Date</th>
-          <th>Screenshot</th>
+          <th>Details</th>
         </tr>
       </thead>
       <tbody>
@@ -191,17 +201,31 @@
           <td class="date-cell" data-label="Date">
             <span class="date-value">{record.date}</span>
           </td>
-          <td class="screenshot-cell" data-label="Screenshot">
-            {#if record.screenshot}
-              <button class="screenshot-btn" on:click={() => showScreenshotModal(record.screenshot)}>
-                <span>📷</span>
-                View Screenshot
-              </button>
-            {:else}
-              <span class="no-screenshot">No image</span>
-            {/if}
+          <td class="screenshot-cell" data-label="Details">
+            <div class="details-container">
+              {#if record.screenshot}
+                <button class="screenshot-btn" on:click={() => showScreenshotModal(record.screenshot)}>
+                  <span>📷</span>
+                  View Screenshot
+                </button>
+              {:else}
+                <span class="no-screenshot">No image</span>
+              {/if}
+              {#if record.description}
+                <button class="description-toggle" on:click={() => toggleDescription(index)}>
+                  {expandedDescriptions.has(index) ? '▼' : '▶'} Description
+                </button>
+              {/if}
+            </div>
           </td>
         </tr>
+        {#if record.description && expandedDescriptions.has(index)}
+        <tr class="description-row">
+          <td colspan={recordType.type !== "completed" ? "3" : "2"} class="description-content">
+            {record.description}
+          </td>
+        </tr>
+        {/if}
         {/each}
       </tbody>
     </table>
@@ -306,11 +330,14 @@
       color: white;
       padding: var(--spacing-xs) var(--spacing-sm);
       border-radius: var(--radius-sm);
-      font-size: 0.6rem;
-      font-weight: 700;
+      font-size: 0.75rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       box-shadow: var(--shadow-sm);
+      height: 28px;
+      display: flex;
+      align-items: center;
     }
 
     /* Date Cell */
@@ -320,16 +347,26 @@
       font-weight: 500;
     }
 
+    /* Details Container */
+    .details-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs);
+      align-items: center;
+      justify-content: flex-end;
+    }
+
     /* Screenshot Button */
     .screenshot-btn {
       display: flex;
       align-items: center;
       gap: var(--spacing-sm);
       background: var(--success-color);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
       padding: var(--spacing-xs) var(--spacing-sm);
       border-radius: var(--radius-sm);
-      margin-left: auto;
+      height: 28px;
     }
 
     .screenshot-btn:hover {
@@ -346,6 +383,42 @@
       color: var(--text-muted);
       font-size: 0.85rem;
       font-style: italic;
+    }
+
+    /* Description Toggle */
+    .description-toggle {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .description-toggle:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Description Row */
+    .description-row {
+      background: rgba(99, 102, 241, 0.03);
+      border-top: none;
+    }
+
+    .description-content {
+      padding: var(--spacing-md) var(--spacing-lg);
+      color: var(--text-secondary);
+      font-style: italic;
+      line-height: 1.5;
+      border-top: 1px solid rgba(99, 102, 241, 0.1);
     }
 
     /* Responsive Design */
@@ -374,9 +447,24 @@
         align-self: center;
       }
       
+      .details-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
       .screenshot-btn {
         justify-content: center;
         width: 100%;
+      }
+
+      .description-toggle {
+        width: 100%;
+        text-align: center;
+      }
+
+      .description-content {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.875rem;
       }
     }
   </style>

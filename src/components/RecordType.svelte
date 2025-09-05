@@ -206,7 +206,7 @@
               {#if record.screenshot}
                 <button class="screenshot-btn" on:click={() => showScreenshotModal(record.screenshot)}>
                   <span>📷</span>
-                  View Screenshot
+                  Screenshot
                 </button>
               {/if}
               {#if record.description}
@@ -450,7 +450,8 @@
       
       .details-container {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
+        justify-content: center;
       }
 
       .screenshot-btn {
@@ -466,6 +467,12 @@
       .description-content {
         padding: var(--spacing-sm) var(--spacing-md);
         font-size: 0.875rem;
+      }
+
+      /* Override mobile table label width for Details column */
+      .screenshot-cell:before {
+        width: auto !important;
+        text-align: left !important;
       }
     }
   </style>

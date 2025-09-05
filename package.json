@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c",
-    "build:subfolder": "BASE_URL=/myapp rollup -c",
+    "build:subfolder": "BASE_URL=/MiScore-site rollup -c",
     "dev": "rollup -c -w",
-    "dev:subfolder": "BASE_URL=/myapp rollup -c -w",
+    "dev:subfolder": "BASE_URL=/MiScore-site rollup -c -w",
     "start": "sirv public --no-clear --single --port 8081 --host",
-    "test:subfolder": "sirv public --no-clear --single --port 8081 --host --base /myapp"
+    "start:subfolder": "sirv public --no-clear --single --port 8081 --host --base /MiScore-site"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",

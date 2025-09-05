@@ -58,12 +58,12 @@
   <header>
     <nav class="navbar">
       <div class="nav-container">
-        <Link to="/" class="nav-brand">
+        <Link to="{$basePath || '/'}" class="nav-brand">
           <span class="brand-text">MiScore</span>
           <span class="brand-subtitle">Gaming Records</span>
         </Link>
         <div class="nav-links">
-          <Link to="/" class="nav-link">
+          <Link to="{$basePath || '/'}" class="nav-link">
             <span>🏠</span>
             Home
           </Link>

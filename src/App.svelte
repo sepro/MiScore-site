@@ -10,13 +10,6 @@
       console.log('App.svelte: onMount started');
       console.log('App.svelte: basePath:', $basePath);
       
-      // Handle hash-based redirects from 404.html
-      if (window.location.hash && window.location.hash.startsWith('#/')) {
-        const hashPath = window.location.hash.slice(1);
-        console.log('App.svelte: Detected hash redirect, navigating to:', hashPath);
-        // Remove hash and use regular routing
-        window.history.replaceState(null, '', `${$basePath}${hashPath}`);
-      }
       
       const url = `${$basePath}/records/data/records.json`;
       console.log('App.svelte: attempting to fetch from:', url);
@@ -54,7 +47,7 @@
     });
 </script>
 
-<Router basepath={$basePath}>
+<Router hash={true} basepath={$basePath || undefined}>
   <header>
     <nav class="navbar">
       <div class="nav-container">

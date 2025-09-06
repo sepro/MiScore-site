@@ -238,32 +238,45 @@ img.screenshot {
     padding: var(--spacing-sm);
   }
   
-  /* Stack table cells on very small screens */
+  /* Hide record count column on games overview table for very small screens */
   @media (max-width: 480px) {
-    table, thead, tbody, th, td, tr {
+    .games-overview-table th:last-child,
+    .games-overview-table td:last-child {
+      display: none;
+    }
+  }
+  
+  /* Stack table cells on very small screens (for other tables like records table) */
+  @media (max-width: 480px) {
+    table:not(.games-overview-table), 
+    table:not(.games-overview-table) thead, 
+    table:not(.games-overview-table) tbody, 
+    table:not(.games-overview-table) th, 
+    table:not(.games-overview-table) td, 
+    table:not(.games-overview-table) tr {
       display: block;
     }
     
-    thead tr {
+    table:not(.games-overview-table) thead tr {
       position: absolute;
       top: -9999px;
       left: -9999px;
     }
     
-    tr {
+    table:not(.games-overview-table) tr {
       border: 1px solid var(--border);
       margin-bottom: var(--spacing-md);
       border-radius: var(--radius-md);
       background: var(--surface);
     }
     
-    td {
+    table:not(.games-overview-table) td {
       border: none;
       position: relative;
       padding-left: 50% !important;
     }
     
-    td:before {
+    table:not(.games-overview-table) td:before {
       content: attr(data-label);
       position: absolute;
       left: var(--spacing-md);

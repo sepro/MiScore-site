@@ -22,7 +22,7 @@
 
 <main>
     <h1>Game Records Overview</h1>
-    <table>
+    <table class="games-overview-table">
       <thead>
         <tr>
           <th>Game</th>

@@ -55,12 +55,6 @@
           <span class="brand-text">MiScore</span>
           <span class="brand-subtitle">Gaming Records</span>
         </Link>
-        <div class="nav-links">
-          <Link to="{$basePath || '/'}" class="nav-link">
-            <span>🏠</span>
-            Home
-          </Link>
-        </div>
       </div>
     </nav>
   </header>

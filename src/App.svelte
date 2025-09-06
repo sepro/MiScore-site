@@ -1,7 +1,8 @@
 <script>
   import {Router, Route, Link} from 'svelte-routing';
   import GameDetails from './routes/GameDetails.svelte';
-  import Home from './routes/Home.svelte'
+  import Home from './routes/Home.svelte';
+  import RecentRecords from './routes/RecentRecords.svelte';
 
   import { onMount } from 'svelte';
   import { gameRecords, isLoading, basePath, createSlug } from './stores.js'
@@ -55,6 +56,12 @@
           <span class="brand-text">MiScore</span>
           <span class="brand-subtitle">Gaming Records</span>
         </Link>
+        <div class="nav-links">
+          <Link to="{$basePath}/recent" class="nav-link">
+            <span>🕒</span>
+            Recent Records
+          </Link>
+        </div>
       </div>
     </nav>
   </header>
@@ -67,6 +74,7 @@
       </div>
     {:else}
       <Route path="/" component={Home} />
+      <Route path="/recent" component={RecentRecords} />
       <Route path="/game/:slug" let:params>
         <GameDetails slug={params.slug} />
       </Route>

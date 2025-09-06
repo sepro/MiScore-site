@@ -166,4 +166,40 @@ export const searchSuggestions = derived(
   }
 );
 
-console.log('stores.js: Stores initialized - gameRecords, isLoading, basePath, searchQuery, filteredRecords, and searchSuggestions');
+// Recent records derived store - flattens and sorts all records by date
+export const recentRecords = derived(
+  gameRecords,
+  (games) => {
+    if (!games || !Array.isArray(games)) return [];
+    
+    const allRecords = [];
+    
+    games.forEach(game => {
+      if (game.record_types && Array.isArray(game.record_types)) {
+        game.record_types.forEach(recordType => {
+          if (recordType.records && Array.isArray(recordType.records)) {
+            recordType.records.forEach(record => {
+              if (record.date) {
+                allRecords.push({
+                  ...record,
+                  gameName: game.name,
+                  gameSlug: game.slug,
+                  recordTypeName: recordType.name,
+                  recordTypeDescription: recordType.description,
+                  recordTypeType: recordType.type
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    // Sort by date (newest first) and take top 10
+    return allRecords
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 10);
+  }
+);
+
+console.log('stores.js: Stores initialized - gameRecords, isLoading, basePath, searchQuery, filteredRecords, searchSuggestions, and recentRecords');

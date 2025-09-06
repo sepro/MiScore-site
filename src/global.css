@@ -156,9 +156,17 @@ a {
   transition: color 0.2s ease;
 }
 
+a:visited {
+  color: var(--primary-color);
+}
+
 a:hover {
   color: var(--secondary-color);
   text-decoration: underline;
+}
+
+a:visited:hover {
+  color: var(--secondary-color);
 }
 
 /* Buttons */

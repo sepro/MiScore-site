@@ -232,6 +232,7 @@
       font-size: 1.2rem;
     }
 
+
     /* Records Container */
     .records-container {
       display: flex;

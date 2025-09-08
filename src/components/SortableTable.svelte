@@ -53,10 +53,12 @@
     return gameData.difficulties.indexOf(difficulty);
   }
   
-  // Update sort state from external props
-  $: if (initialSortColumn !== sortColumn || initialSortDirection !== sortDirection) {
+  // Initialize sort state from props only once
+  let initialized = false;
+  $: if (!initialized && initialSortColumn) {
     sortColumn = initialSortColumn;
     sortDirection = initialSortDirection;
+    initialized = true;
   }
 
   $: sortedData = onSort ? data : data.slice().sort((a, b) => {
@@ -121,7 +123,7 @@
     {#each sortedData as row, index}
       <tr>
         {#each columns as column}
-          <td>
+          <td data-label={column.label}>
             {#if column.component}
               <svelte:component this={column.component} {row} {column} {...(column.componentProps || {})} />
             {:else if column.render}

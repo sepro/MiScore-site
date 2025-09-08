@@ -282,6 +282,7 @@ img.screenshot {
       border: none;
       position: relative;
       padding-left: 50% !important;
+      text-align: left !important;
     }
     
     table:not(.games-overview-table) td:before {

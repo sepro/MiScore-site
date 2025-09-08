@@ -4,17 +4,46 @@
   export let initialSortColumn = '';
   export let initialSortDirection = 'asc';
   export let tableClass = '';
+  export let gameData = null; // For difficulty sorting
+  export let expandableRows = false; // Support for expandable rows
+  export let expandedRows = new Set(); // Which rows are expanded
+  export let getRowId = (row, index) => index; // Function to get unique row ID
   
   let sortColumn = initialSortColumn || (columns.length > 0 ? columns[0].key : '');
   let sortDirection = initialSortDirection;
   
   function handleSort(column) {
+    const columnConfig = columns.find(col => col.key === column);
+    if (columnConfig?.sortable === false) return; // Don't sort non-sortable columns
+    
     if (sortColumn === column) {
       sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       sortColumn = column;
       sortDirection = 'asc';
     }
+  }
+
+  // Helper functions for parsing different data types
+  function parseTime(timeString) {
+    if (!timeString) return 0;
+    const parts = timeString.split(':').map(Number);
+    if (parts.length === 3) {
+      return parts[0] * 3600 + parts[1] * 60 + parts[2]; // HH:MM:SS
+    } else if (parts.length === 2) {
+      return parts[0] * 60 + parts[1]; // MM:SS
+    }
+    return 0;
+  }
+
+  function parseDate(dateString) {
+    if (!dateString) return new Date(0);
+    return new Date(dateString);
+  }
+
+  function parseDifficulty(difficulty) {
+    if (!gameData?.difficulties || !difficulty) return -1;
+    return gameData.difficulties.indexOf(difficulty);
   }
   
   $: sortedData = data.slice().sort((a, b) => {
@@ -30,7 +59,19 @@
     }
     
     let result;
-    if (typeof aVal === 'string') {
+    
+    // Handle special data types
+    if (columnConfig?.dataType === 'time') {
+      result = parseTime(aVal) - parseTime(bVal);
+    } else if (columnConfig?.dataType === 'date') {
+      result = parseDate(aVal).getTime() - parseDate(bVal).getTime();
+    } else if (columnConfig?.dataType === 'difficulty') {
+      result = parseDifficulty(aVal) - parseDifficulty(bVal);
+    } else if (columnConfig?.dataType === 'score' || typeof aVal === 'number') {
+      const numA = parseInt(aVal, 10) || 0;
+      const numB = parseInt(bVal, 10) || 0;
+      result = numA - numB;
+    } else if (typeof aVal === 'string') {
       result = aVal.localeCompare(bVal);
     } else {
       result = aVal - bVal;
@@ -50,24 +91,26 @@
     <tr>
       {#each columns as column}
         <th 
-          class="sortable-header {sortColumn === column.key ? 'active' : ''}"
+          class="sortable-header {sortColumn === column.key ? 'active' : ''} {column.sortable === false ? 'non-sortable' : ''}"
           on:click={() => handleSort(column.key)}
         >
           <span class="header-content">
             {column.label}
-            <span class="sort-icon {sortColumn === column.key ? 'visible' : 'invisible'}">{getSortIcon(column.key)}</span>
+            {#if column.sortable !== false}
+              <span class="sort-icon {sortColumn === column.key ? 'visible' : 'invisible'}">{getSortIcon(column.key)}</span>
+            {/if}
           </span>
         </th>
       {/each}
     </tr>
   </thead>
   <tbody>
-    {#each sortedData as row}
+    {#each sortedData as row, index}
       <tr>
         {#each columns as column}
           <td>
             {#if column.component}
-              <svelte:component this={column.component} {row} {column} />
+              <svelte:component this={column.component} {row} {column} {...(column.componentProps || {})} />
             {:else if column.render}
               {@html column.render(row)}
             {:else}
@@ -76,6 +119,13 @@
           </td>
         {/each}
       </tr>
+      {#if expandableRows && expandedRows.has(getRowId(row, index))}
+        <tr class="expanded-row">
+          <td colspan={columns.length} class="expanded-content">
+            <slot name="expanded-content" {row} {index} />
+          </td>
+        </tr>
+      {/if}
     {/each}
   </tbody>
 </table>
@@ -84,6 +134,7 @@
   .sortable-table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 0;
   }
   
   .sortable-header {
@@ -92,8 +143,12 @@
     transition: background-color 0.2s ease;
     padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
   }
+
+  .sortable-header.non-sortable {
+    cursor: default;
+  }
   
-  .sortable-header:hover {
+  .sortable-header:hover:not(.non-sortable) {
     background-color: var(--surface-hover, rgba(0, 0, 0, 0.05));
   }
   
@@ -131,5 +186,16 @@
   /* Ensure table cells have consistent padding */
   .sortable-table td {
     padding: var(--spacing-sm, 8px) var(--spacing-md, 12px);
+  }
+
+  /* Expanded row styling */
+  .expanded-row {
+    background: rgba(99, 102, 241, 0.03);
+    border-top: none;
+  }
+
+  .expanded-content {
+    padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+    border-top: 1px solid rgba(99, 102, 241, 0.1);
   }
 </style>

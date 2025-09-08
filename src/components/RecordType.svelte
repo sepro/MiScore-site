@@ -1,5 +1,9 @@
 <script>
     import Modal from './Modal.svelte';
+    import SortableTable from './SortableTable.svelte';
+    import RecordValueCell from './RecordValueCell.svelte';
+    import RecordDateCell from './RecordDateCell.svelte';
+    import RecordDetailsCell from './RecordDetailsCell.svelte';
     export let recordType;
     export let correctScreenshotPath;
     export let gameData;
@@ -163,6 +167,48 @@
       // For any other types or fallback, don't show the badge
       return false;
     }
+
+    // Prepare data for SortableTable
+    $: tableData = recordType.records.map((record, index) => ({
+      ...record,
+      _index: index,
+      _records: recordType.records,
+      _type: recordType.type,
+      _gameData: gameData
+    }));
+
+    // Configure columns based on record type
+    $: columns = [
+      // Value column (difficulty/score/time) - only if not "completed" type
+      ...(recordType.type !== "completed" ? [{
+        key: recordType.type === "completed_at_difficulty" ? "difficulty" : 
+             recordType.type === "high_score" || recordType.type === "low_score" ? "score" : "time",
+        label: recordTypeToValue(recordType.type),
+        component: RecordValueCell,
+        dataType: recordType.type === "completed_at_difficulty" ? "difficulty" :
+                   recordType.type === "high_score" || recordType.type === "low_score" ? "score" :
+                   recordType.type === "fastest_time" || recordType.type === "longest_time" ? "time" : "string"
+      }] : []),
+      // Date column
+      {
+        key: "date",
+        label: "Date", 
+        component: RecordDateCell,
+        dataType: "date"
+      },
+      // Details column (non-sortable)
+      {
+        key: "details",
+        label: "Details",
+        component: RecordDetailsCell,
+        sortable: false,
+        componentProps: {
+          showScreenshotModal,
+          toggleDescription,
+          expandedDescriptions
+        }
+      }
+    ];
 </script>
   
   <div class="record-header">
@@ -177,59 +223,21 @@
   </div>
 
   <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          {#if recordType.type !== "completed"}
-            <th>{recordTypeToValue(recordType.type)}</th>
-          {/if}
-          <th>Date</th>
-          <th>Details</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each recordType.records as record, index}
-        <tr class="record-row" class:has-screenshot={record.screenshot}>
-          {#if recordType.type !== "completed"}
-            <td class="value-cell" data-label="{recordTypeToValue(recordType.type)}">
-              <span class="record-value">{record.difficulty || record.score || record.time || '-'}</span>
-              {#if isBestRecord(record, index, recordType.records, recordType.type)}
-                <span class="best-badge">BEST</span>
-              {/if}
-            </td>
-          {/if}
-          <td class="date-cell" data-label="Date">
-            <span class="date-value">{record.date}</span>
-          </td>
-          <td class="screenshot-cell" data-label="Details">
-            <div class="details-container">
-              {#if record.screenshot}
-                <button class="screenshot-btn" on:click={() => showScreenshotModal(record.screenshot)}>
-                  <span>📷</span>
-                  Screenshot
-                </button>
-              {/if}
-              {#if record.description}
-                <button class="description-toggle" on:click={() => toggleDescription(index)}>
-                  {expandedDescriptions.has(index) ? '▼' : '▶'} Description
-                </button>
-              {/if}
-              {#if !record.screenshot && !record.description}
-                <span class="no-details">No details</span>
-              {/if}
-            </div>
-          </td>
-        </tr>
-        {#if record.description && expandedDescriptions.has(index)}
-        <tr class="description-row">
-          <td colspan={recordType.type !== "completed" ? "3" : "2"} class="description-content">
-            {record.description}
-          </td>
-        </tr>
-        {/if}
-        {/each}
-      </tbody>
-    </table>
+    <SortableTable 
+      data={tableData}
+      {columns}
+      {gameData}
+      initialSortColumn="date"
+      initialSortDirection="desc"
+      tableClass="records-table"
+      expandableRows={true}
+      expandedRows={expandedDescriptions}
+      getRowId={(row) => row._index}
+    >
+      <div slot="expanded-content" let:row class="description-content">
+        {row.description}
+      </div>
+    </SortableTable>
   </div>
   
   <Modal isVisible={showModal} imgSrc={modalImageSrc} onClose={closeModal}/>
@@ -295,131 +303,11 @@
       border: 1px solid var(--border);
     }
 
-    .table-container table {
-      margin: 0;
-      box-shadow: none;
-      border-radius: 0;
-    }
-
-    /* Enhanced Table Rows */
-    .record-row.has-screenshot {
-      background: rgba(99, 102, 241, 0.02);
-    }
-
-    .record-row:hover.has-screenshot {
-      background: rgba(99, 102, 241, 0.05);
-    }
-
-    /* Value Cell Enhancements */
-    .value-cell {
-      position: relative;
-      font-weight: 600;
-      font-size: 1.05rem;
-    }
-
-    .record-value {
-      color: var(--primary-color);
-      font-weight: 700;
-    }
-
-    .best-badge {
-      position: absolute;
-      right: var(--spacing-sm);
-      top: 50%;
-      transform: translateY(-50%);
-      background: var(--success-color);
-      color: white;
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border-radius: var(--radius-sm);
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      box-shadow: var(--shadow-sm);
-      height: 28px;
-      display: flex;
-      align-items: center;
-    }
-
-    /* Date Cell */
-    .date-value {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-
-    /* Details Container */
-    .details-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--spacing-xs);
-      align-items: center;
-      justify-content: flex-end;
-    }
-
-    /* Screenshot Button */
-    .screenshot-btn {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      background: var(--success-color);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border-radius: var(--radius-sm);
-      height: 28px;
-    }
-
-    .screenshot-btn:hover {
-      background: #059669;
-      transform: translateY(-1px);
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
-    }
-
-    .screenshot-btn span {
-      font-size: 1rem;
-    }
-
-    .no-details {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      font-style: italic;
-    }
-
-    /* Description Toggle */
-    .description-toggle {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border-radius: var(--radius-sm);
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      height: 28px;
-      display: flex;
-      align-items: center;
-    }
-
-    .description-toggle:hover {
-      background: #4338ca;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
-    }
-
-    /* Description Row */
-    .description-row {
-      background: rgba(99, 102, 241, 0.03);
-      border-top: none;
-    }
-
+    /* Description content (shown in expanded rows) */
     .description-content {
-      padding: var(--spacing-md) var(--spacing-lg);
       color: var(--text-secondary);
       font-style: italic;
       line-height: 1.5;
-      border-top: 1px solid rgba(99, 102, 241, 0.1);
     }
 
     /* Responsive Design */
@@ -429,16 +317,8 @@
         align-self: flex-start;
         margin-top: var(--spacing-sm);
       }
-
-      .best-badge {
-        position: static;
-        transform: none;
-        margin-left: var(--spacing-sm);
-        display: inline-block;
-      }
     }
 
-    /* Mobile table stacking is handled by global.css */
     @media (max-width: 480px) {
       .record-header {
         text-align: center;
@@ -447,32 +327,9 @@
       .record-count {
         align-self: center;
       }
-      
-      .details-container {
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: center;
-      }
 
-      .screenshot-btn {
-        justify-content: center;
-        width: 100%;
-      }
-
-      .description-toggle {
-        width: 100%;
-        text-align: center;
-      }
-
-      .description-content {
-        padding: var(--spacing-sm) var(--spacing-md);
+      :global(.expanded-content .description-content) {
         font-size: 0.875rem;
-      }
-
-      /* Override mobile table label width for Details column */
-      .screenshot-cell:before {
-        width: auto !important;
-        text-align: left !important;
       }
     }
   </style>

@@ -8,6 +8,7 @@
   export let expandableRows = false; // Support for expandable rows
   export let expandedRows = new Set(); // Which rows are expanded
   export let getRowId = (row, index) => index; // Function to get unique row ID
+  export let onSort = null; // Callback for external sort handling
   
   let sortColumn = initialSortColumn || (columns.length > 0 ? columns[0].key : '');
   let sortDirection = initialSortDirection;
@@ -16,11 +17,17 @@
     const columnConfig = columns.find(col => col.key === column);
     if (columnConfig?.sortable === false) return; // Don't sort non-sortable columns
     
-    if (sortColumn === column) {
-      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    if (onSort) {
+      // External sort handling
+      onSort(column);
     } else {
-      sortColumn = column;
-      sortDirection = 'asc';
+      // Internal sort handling
+      if (sortColumn === column) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+      }
     }
   }
 
@@ -46,7 +53,13 @@
     return gameData.difficulties.indexOf(difficulty);
   }
   
-  $: sortedData = data.slice().sort((a, b) => {
+  // Update sort state from external props
+  $: if (initialSortColumn !== sortColumn || initialSortDirection !== sortDirection) {
+    sortColumn = initialSortColumn;
+    sortDirection = initialSortDirection;
+  }
+
+  $: sortedData = onSort ? data : data.slice().sort((a, b) => {
     const columnConfig = columns.find(col => col.key === sortColumn);
     let aVal, bVal;
     

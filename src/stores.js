@@ -43,6 +43,20 @@ function createPersistedSearchQuery() {
 
 export const searchQuery = createPersistedSearchQuery();
 
+// Pagination state
+export const pagination = writable({
+  currentPage: 1,
+  itemsPerPage: 15, // Set to 5 for testing
+  totalItems: 0,
+  totalPages: 0
+});
+
+// Sort state for home page
+export const sortState = writable({
+  column: 'name',
+  direction: 'asc'
+});
+
 // Function to create URL-friendly slugs from game names
 export function createSlug(name) {
   return name
@@ -124,6 +138,63 @@ export const filteredRecords = derived(
   }
 );
 
+// Helper function to apply sorting
+function applySorting(records, sortState) {
+  if (!records || !sortState) return records;
+  
+  return [...records].sort((a, b) => {
+    let aVal = a[sortState.column];
+    let bVal = b[sortState.column];
+    
+    // Handle name sorting (remove "The " prefix)
+    if (sortState.column === 'name') {
+      aVal = aVal.replace(/^The /i, '').toLowerCase();
+      bVal = bVal.replace(/^The /i, '').toLowerCase();
+    }
+    
+    let result;
+    if (typeof aVal === 'string') {
+      result = aVal.localeCompare(bVal);
+    } else {
+      result = aVal - bVal;
+    }
+    
+    return sortState.direction === 'desc' ? -result : result;
+  });
+}
+
+// Sorted and filtered records (without pagination)
+export const sortedFilteredRecords = derived(
+  [filteredRecords, sortState],
+  ([filtered, sort]) => {
+    if (!filtered || !Array.isArray(filtered)) return [];
+    return applySorting(filtered, sort);
+  }
+);
+
+// Derived store to update pagination totals (separate from data)
+export const paginationTotals = derived(
+  [sortedFilteredRecords, pagination],
+  ([sorted, pag]) => {
+    const totalItems = sorted.length;
+    const totalPages = Math.ceil(totalItems / pag.itemsPerPage);
+    return { totalItems, totalPages };
+  }
+);
+
+// Paginated records derived store (just slices the data)
+export const paginatedRecords = derived(
+  [sortedFilteredRecords, pagination],
+  ([sorted, pag]) => {
+    if (!sorted || !Array.isArray(sorted)) return [];
+    
+    const startIndex = (pag.currentPage - 1) * pag.itemsPerPage;
+    const endIndex = startIndex + pag.itemsPerPage;
+    
+    return sorted.slice(startIndex, endIndex);
+  }
+);
+
 // Get search suggestions
 export const searchSuggestions = derived(
   [gameRecords, searchQuery],
@@ -202,4 +273,4 @@ export const recentRecords = derived(
   }
 );
 
-console.log('stores.js: Stores initialized - gameRecords, isLoading, basePath, searchQuery, filteredRecords, searchSuggestions, and recentRecords');
+console.log('stores.js: Stores initialized - gameRecords, isLoading, basePath, searchQuery, filteredRecords, searchSuggestions, recentRecords, pagination, sortState, and paginatedRecords');

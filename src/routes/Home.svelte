@@ -1,9 +1,10 @@
 <script>
     import '../global.css';
-    import { gameRecords, basePath, filteredRecords, searchQuery } from '../stores.js'
+    import { gameRecords, basePath, filteredRecords, searchQuery, paginatedRecords, pagination, sortState, paginationTotals } from '../stores.js'
     import SearchInput from '../components/SearchInput.svelte';
     import SortableTable from '../components/SortableTable.svelte';
     import GameNameCell from '../components/GameNameCell.svelte';
+    import PaginationControls from '../components/PaginationControls.svelte';
     import { onMount, onDestroy } from 'svelte';
 
     let unsubscribe;
@@ -12,6 +13,22 @@
     onMount(() => {
       searchQuery.restore();
     });
+
+    // Reset to page 1 when search query changes
+    $: if ($searchQuery !== undefined) {
+      pagination.update(p => ({ ...p, currentPage: 1 }));
+    }
+
+    // Update pagination totals when they change
+    $: if ($paginationTotals) {
+      pagination.update(p => ({ 
+        ...p, 
+        totalItems: $paginationTotals.totalItems,
+        totalPages: $paginationTotals.totalPages,
+        // Ensure current page is valid
+        currentPage: Math.min(p.currentPage, Math.max(1, $paginationTotals.totalPages))
+      }));
+    }
     
     function getSearchResultText(count, query) {
       if (!query.trim()) return '';
@@ -52,12 +69,25 @@
     
     {#if $filteredRecords.length > 0}
       <SortableTable 
-        data={$filteredRecords} 
+        data={$paginatedRecords} 
         {columns}
-        initialSortColumn="name"
-        initialSortDirection="asc"
+        initialSortColumn={$sortState.column}
+        initialSortDirection={$sortState.direction}
         tableClass="games-overview-table"
+        onSort={(column) => {
+          sortState.update(current => {
+            if (current.column === column) {
+              return { ...current, direction: current.direction === 'asc' ? 'desc' : 'asc' };
+            } else {
+              return { column, direction: 'asc' };
+            }
+          });
+          // Reset to page 1 when sorting changes
+          pagination.update(p => ({ ...p, currentPage: 1 }));
+        }}
       />
+      
+      <PaginationControls />
     {:else if $filteredRecords.length === 0 && $searchQuery.trim()}
       <div class="no-results">
         <p>No games match your search for "{$searchQuery}"</p>

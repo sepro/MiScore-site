@@ -1,9 +1,9 @@
 <script>
     import '../global.css';
-    import { Link, navigate } from 'svelte-routing';
     import { gameRecords, basePath, filteredRecords, searchQuery } from '../stores.js'
     import SearchInput from '../components/SearchInput.svelte';
-    import HighlightText from '../components/HighlightText.svelte';
+    import SortableTable from '../components/SortableTable.svelte';
+    import GameNameCell from '../components/GameNameCell.svelte';
     import { onMount, onDestroy } from 'svelte';
 
     let unsubscribe;
@@ -19,6 +19,20 @@
       if (count === 1) return '1 game found - Press Enter to navigate';
       return `${count} games found`;
     }
+    
+    // Table configuration
+    const columns = [
+      {
+        key: 'name',
+        label: 'Game',
+        component: GameNameCell,
+        sortValue: (row) => row.name.replace(/^The /i, '').toLowerCase()
+      },
+      {
+        key: 'recordCount',
+        label: 'Record Count'
+      }
+    ];
     
     onDestroy(() => {
       if (unsubscribe) unsubscribe();
@@ -37,26 +51,13 @@
     {/if}
     
     {#if $filteredRecords.length > 0}
-      <table class="games-overview-table">
-        <thead>
-          <tr>
-            <th>Game</th>
-            <th>Record Count</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each $filteredRecords as game}
-            <tr>
-              <td>
-                <Link to="{$basePath}/game/{game.slug}">
-                  <HighlightText text={game.name} searchQuery={$searchQuery} />
-                </Link>
-              </td>
-              <td>{game.recordCount}</td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+      <SortableTable 
+        data={$filteredRecords} 
+        {columns}
+        initialSortColumn="name"
+        initialSortDirection="asc"
+        tableClass="games-overview-table"
+      />
     {:else if $filteredRecords.length === 0 && $searchQuery.trim()}
       <div class="no-results">
         <p>No games match your search for "{$searchQuery}"</p>

@@ -53,9 +53,14 @@
     return gameData.difficulties.indexOf(difficulty);
   }
   
-  // Initialize sort state from props only once
+  // Keep internal sort state synchronized with external props
   let initialized = false;
-  $: if (!initialized && initialSortColumn) {
+  $: if (onSort) {
+    // When using external sort handling, always sync with external state
+    sortColumn = initialSortColumn || (columns.length > 0 ? columns[0].key : '');
+    sortDirection = initialSortDirection;
+  } else if (!initialized && initialSortColumn) {
+    // Initialize sort state from props only once for internal sorting
     sortColumn = initialSortColumn;
     sortDirection = initialSortDirection;
     initialized = true;

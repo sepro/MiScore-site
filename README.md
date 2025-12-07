@@ -11,6 +11,12 @@ git submodule update --init
 npm install
 ```
 
+If you need to update the data, please run
+
+```bash
+git submodule foreach git pull origin main
+```
+
 ...then start [Rollup](https://rollupjs.org):
 
 ```bash

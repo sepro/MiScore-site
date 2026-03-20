@@ -177,18 +177,30 @@
       _gameData: gameData
     }));
 
+    const componentToColumnConfig = (component) => {
+      const key = component === "completed_at_difficulty" ? "difficulty" :
+                  component === "high_score" || component === "low_score" ? "score" : "time";
+      const label = component === "completed_at_difficulty" ? "Difficulty" :
+                    component === "high_score" || component === "low_score" ? "Score" : "Time";
+      const dataType = component === "completed_at_difficulty" ? "difficulty" :
+                       component === "high_score" || component === "low_score" ? "score" : "time";
+      return { key, label, dataType, component: RecordValueCell, componentProps: { componentType: component } };
+    };
+
     // Configure columns based on record type
     $: columns = [
-      // Value column (difficulty/score/time) - only if not "completed" type
-      ...(recordType.type !== "completed" ? [{
-        key: recordType.type === "completed_at_difficulty" ? "difficulty" : 
-             recordType.type === "high_score" || recordType.type === "low_score" ? "score" : "time",
-        label: recordTypeToValue(recordType.type),
-        component: RecordValueCell,
-        dataType: recordType.type === "completed_at_difficulty" ? "difficulty" :
-                   recordType.type === "high_score" || recordType.type === "low_score" ? "score" :
-                   recordType.type === "fastest_time" || recordType.type === "longest_time" ? "time" : "string"
-      }] : []),
+      // Value columns - one per component for "complex" type, or single column for simple types
+      ...(recordType.type === "complex"
+        ? (recordType.components || []).map(componentToColumnConfig)
+        : recordType.type !== "completed" ? [{
+            key: recordType.type === "completed_at_difficulty" ? "difficulty" :
+                 recordType.type === "high_score" || recordType.type === "low_score" ? "score" : "time",
+            label: recordTypeToValue(recordType.type),
+            component: RecordValueCell,
+            dataType: recordType.type === "completed_at_difficulty" ? "difficulty" :
+                       recordType.type === "high_score" || recordType.type === "low_score" ? "score" :
+                       recordType.type === "fastest_time" || recordType.type === "longest_time" ? "time" : "string"
+          }] : []),
       // Date column
       {
         key: "date",

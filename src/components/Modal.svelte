@@ -132,8 +132,7 @@
       padding: var(--spacing-xl);
       border-radius: var(--radius-xl);
       border: 1px solid var(--border);
-      width: 95%;
-      max-width: 1200px;
+      max-width: min(95vw, 1200px);
       max-height: 90vh;
       box-shadow: var(--shadow-lg);
       position: relative;
@@ -178,6 +177,18 @@
       background: var(--primary-color);
       transform: scale(1.1);
       box-shadow: var(--shadow-glow);
+    }
+
+    .screenshot-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .screenshot {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
     }
 
     /* Responsive design */

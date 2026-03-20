@@ -160,7 +160,7 @@
       }}
       type="text"
       {placeholder}
-      class="search-input"
+      class="search-input {showSuggestions && inputValue.length >= 2 ? 'open' : ''}"
       autocomplete="off"
     />
     
@@ -239,6 +239,7 @@
     width: 100%;
     padding: var(--spacing-md);
     padding-right: 3rem;
+    margin: 0;
     border: 2px solid var(--border);
     border-radius: var(--radius-lg);
     background: var(--surface);
@@ -251,6 +252,12 @@
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .search-input.open {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
   }
   
   .search-input::placeholder {

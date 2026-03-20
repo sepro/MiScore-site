@@ -1,6 +1,9 @@
 <script>
   export let row;
-  
+  export let componentType = null; // For "complex" record types, overrides row._type per column
+
+  $: effectiveType = componentType || row._type;
+
   // Import the isBestRecord function logic
   function isBestRecord(record, index, records, type, gameData) {
     if (type === "completed_at_difficulty") {
@@ -131,8 +134,18 @@
 </script>
 
 <div class="value-cell">
-  <span class="record-value">{row.difficulty || row.score || row.time || '-'}</span>
-  {#if isBestRecord(row, row._index, row._records, row._type, row._gameData)}
+  <span class="record-value">
+    {#if effectiveType === 'completed_at_difficulty'}
+      {row.difficulty || '-'}
+    {:else if effectiveType === 'high_score' || effectiveType === 'low_score'}
+      {row.score ?? '-'}
+    {:else if effectiveType === 'fastest_time' || effectiveType === 'longest_time'}
+      {row.time || '-'}
+    {:else}
+      {row.difficulty || row.score || row.time || '-'}
+    {/if}
+  </span>
+  {#if isBestRecord(row, row._index, row._records, effectiveType, row._gameData)}
     <span class="best-badge">BEST</span>
   {/if}
 </div>

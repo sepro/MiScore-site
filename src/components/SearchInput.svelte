@@ -13,6 +13,7 @@
   let debounceTimer;
   
   let hasUserInteracted = false;
+  let isFocused = false;
   
   // Restore search input value when component mounts (works for both back button and direct navigation)
   onMount(() => {
@@ -153,11 +154,13 @@
       on:keydown={handleKeydown}
       on:input={handleInput}
       on:focus={() => {
+        isFocused = true;
         hasUserInteracted = true;
         if (inputValue.length >= 2) {
           showSuggestions = true;
         }
       }}
+      on:blur={() => { isFocused = false; }}
       type="text"
       {placeholder}
       class="search-input {showSuggestions && inputValue.length >= 2 ? 'open' : ''}"
@@ -180,7 +183,7 @@
   </div>
   
   {#if showSuggestions && (inputValue.length >= 2)}
-    <div class="suggestions-dropdown">
+    <div class="suggestions-dropdown {isFocused ? 'focused' : ''}">
       {#if $searchSuggestions.games.length > 0}
         <div class="suggestion-category">
           <div class="category-header">Games ({$searchSuggestions.games.length})</div>
@@ -310,6 +313,11 @@
     z-index: 1000;
     max-height: 300px;
     overflow-y: auto;
+  }
+
+  .suggestions-dropdown.focused {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   }
   
   .suggestion-category {

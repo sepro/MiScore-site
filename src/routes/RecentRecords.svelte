@@ -3,6 +3,7 @@
   import { Link } from 'svelte-routing';
   import { recentRecords, basePath } from '../stores.js';
   import Modal from '../components/Modal.svelte';
+  import NeonFlicker from '../components/NeonFlicker.svelte';
 
   let showModal = false;
   let modalImageSrc = '';
@@ -61,7 +62,7 @@
     </Link>
   </div>
 
-  <h1>◆ RECENT RECORDS</h1>
+  <NeonFlicker tag="h1" text="◆ RECENT RECORDS" />
   <p class="page-sub">THE 10 MOST RECENTLY ACHIEVED RECORDS</p>
 
   {#if $recentRecords.length === 0}

@@ -3,6 +3,7 @@
     import { Link } from 'svelte-routing';
     import { gameRecords, basePath, isLoading } from '../stores.js';
     import RecordType from '../components/RecordType.svelte';
+    import NeonFlicker from '../components/NeonFlicker.svelte';
     import { onMount } from 'svelte';
 
     export let slug;
@@ -93,7 +94,7 @@
             <path d="M25 12 L25 25 L12 25" fill="none" stroke="hsl({hue},80%,62%)" stroke-width="1.5"/>
           </svg>
 
-          <h1 class="hero-title">{gameData.name}</h1>
+          <NeonFlicker tag="h1" text={gameData.name} class="hero-title" />
           <div
             class="hero-rule"
             style="background: linear-gradient(90deg, hsl({hue},80%,60%) 0%, rgba(255,255,255,0.08) 100%);"
@@ -192,7 +193,7 @@
     .hero-corner.bl { bottom: 14px; left: 14px; }
     .hero-corner.br { bottom: 14px; right: 14px; }
 
-    .hero-title {
+    :global(.hero-title) {
       font-family: var(--font-px);
       font-size: 20px;
       color: #fff;
@@ -311,7 +312,7 @@
 
     @media (max-width: 600px) {
       .hero-inner { padding: 36px 20px 24px; }
-      .hero-title { font-size: 15px; line-height: 1.6; }
+      :global(.hero-title) { font-size: 15px; line-height: 1.6; }
       .stats-row { gap: 10px; }
       .stat-num { font-size: 22px; }
       .stat-lbl { font-size: 9px; letter-spacing: 2px; }

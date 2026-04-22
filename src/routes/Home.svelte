@@ -5,6 +5,7 @@
     import SortableTable from '../components/SortableTable.svelte';
     import GameNameCell from '../components/GameNameCell.svelte';
     import PaginationControls from '../components/PaginationControls.svelte';
+    import NeonFlicker from '../components/NeonFlicker.svelte';
     import { onMount, onDestroy } from 'svelte';
 
     let unsubscribe;
@@ -52,7 +53,7 @@
 </script>
 
 <main>
-    <h1>◆ GAME RECORDS OVERVIEW</h1>
+    <NeonFlicker tag="h1" text="◆ GAME RECORDS OVERVIEW" />
 
     <SearchInput />
 

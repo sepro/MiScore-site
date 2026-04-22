@@ -3,45 +3,40 @@
   import { navigate } from 'svelte-routing';
   import { onMount, onDestroy } from 'svelte';
   import HighlightText from './HighlightText.svelte';
-  
+
   export let placeholder = "Search games and records...";
-  
+
   let inputValue = '';
   let showSuggestions = false;
   let selectedSuggestionIndex = -1;
   let searchInputElement;
   let debounceTimer;
-  
+
   let hasUserInteracted = false;
   let isFocused = false;
-  
-  // Restore search input value when component mounts (works for both back button and direct navigation)
+
   onMount(() => {
     const restored = searchQuery.restore();
     if (restored) {
       inputValue = restored;
-      // Don't show suggestions until user interacts
       hasUserInteracted = false;
     }
   });
-  
-  // Debounced search update
+
   function updateSearch(value) {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       searchQuery.set(value);
     }, 300);
   }
-  
-  // Handle input changes from user typing
+
   function handleInput(event) {
     hasUserInteracted = true;
     inputValue = event.target.value;
   }
-  
+
   $: {
     updateSearch(inputValue);
-    // Only show suggestions if user has interacted and input is long enough
     if (inputValue.length >= 2 && hasUserInteracted) {
       showSuggestions = true;
       selectedSuggestionIndex = -1;
@@ -49,10 +44,9 @@
       showSuggestions = false;
     }
   }
-  
-  // Calculate total suggestions for keyboard navigation
+
   $: totalSuggestions = $searchSuggestions.games.length + $searchSuggestions.recordTypes.length;
-  
+
   function handleKeydown(event) {
     if (!showSuggestions || totalSuggestions === 0) {
       if (event.key === 'Escape') {
@@ -60,7 +54,7 @@
       }
       return;
     }
-    
+
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -86,59 +80,53 @@
         break;
     }
   }
-  
+
   function selectSuggestion(index) {
     const gameCount = $searchSuggestions.games.length;
-    
+
     if (index < gameCount) {
-      // Game suggestion selected - navigate directly to game
       const game = $searchSuggestions.games[index];
       inputValue = game.name;
       searchQuery.set(game.name);
       navigate(`${$basePath}/game/${game.slug}`);
     } else {
-      // Record type suggestion selected - show filtered overview
       const recordType = $searchSuggestions.recordTypes[index - gameCount];
       inputValue = recordType;
       searchQuery.set(recordType);
-      // Don't navigate, just show filtered results in table
     }
-    
+
     showSuggestions = false;
     selectedSuggestionIndex = -1;
     searchInputElement?.blur();
   }
-  
+
   function handleEnterNavigation() {
     if (!inputValue.trim()) return;
-    
-    // Hide suggestions dropdown regardless of result count
+
     showSuggestions = false;
     selectedSuggestionIndex = -1;
     searchInputElement?.blur();
-    
-    // Auto-navigate only when user presses Enter and there's exactly one result
+
     if ($filteredRecords.length === 1) {
       const singleResult = $filteredRecords[0];
       navigate(`${$basePath}/game/${singleResult.slug}`);
     }
-    // For multiple results, just hide dropdown and show filtered table
   }
-  
+
   function clearSearch() {
     inputValue = '';
     searchQuery.set('');
     showSuggestions = false;
     selectedSuggestionIndex = -1;
   }
-  
+
   function handleClickOutside(event) {
     if (!event.target.closest('.search-container')) {
       showSuggestions = false;
       selectedSuggestionIndex = -1;
     }
   }
-  
+
   onDestroy(() => {
     clearTimeout(debounceTimer);
   });
@@ -166,27 +154,27 @@
       class="search-input {showSuggestions && inputValue.length >= 2 ? 'open' : ''}"
       autocomplete="off"
     />
-    
+
     <div class="search-icons">
       {#if inputValue}
-        <button 
-          class="clear-button" 
+        <button
+          class="clear-button"
           on:click={clearSearch}
           aria-label="Clear search"
         >
           ×
         </button>
       {:else}
-        <div class="search-icon">🔍</div>
+        <span class="search-icon" aria-hidden="true">⌕</span>
       {/if}
     </div>
   </div>
-  
+
   {#if showSuggestions && (inputValue.length >= 2)}
     <div class="suggestions-dropdown {isFocused ? 'focused' : ''}">
       {#if $searchSuggestions.games.length > 0}
         <div class="suggestion-category">
-          <div class="category-header">Games ({$searchSuggestions.games.length})</div>
+          <div class="category-header">GAMES ({$searchSuggestions.games.length})</div>
           {#each $searchSuggestions.games as game, index}
             <button
               class="suggestion-item game-suggestion {selectedSuggestionIndex === index ? 'selected' : ''}"
@@ -199,10 +187,10 @@
           {/each}
         </div>
       {/if}
-      
+
       {#if $searchSuggestions.recordTypes.length > 0}
         <div class="suggestion-category">
-          <div class="category-header">Categories ({$searchSuggestions.recordTypes.length})</div>
+          <div class="category-header">CATEGORIES ({$searchSuggestions.recordTypes.length})</div>
           {#each $searchSuggestions.recordTypes as recordType, index}
             <button
               class="suggestion-item record-suggestion {selectedSuggestionIndex === ($searchSuggestions.games.length + index) ? 'selected' : ''}"
@@ -211,12 +199,12 @@
               <span class="suggestion-text">
                 <HighlightText text={recordType} searchQuery={inputValue} highlightClass="suggestion-highlight" />
               </span>
-              <span class="suggestion-meta">Record type</span>
+              <span class="suggestion-meta">RECORD TYPE</span>
             </button>
           {/each}
         </div>
       {/if}
-      
+
       {#if $searchSuggestions.games.length === 0 && $searchSuggestions.recordTypes.length === 0}
         <div class="no-suggestions">No matches found</div>
       {/if}
@@ -228,183 +216,170 @@
   .search-container {
     position: relative;
     width: 100%;
-    max-width: 400px;
-    margin: 0 auto var(--spacing-xl) auto;
+    max-width: 420px;
+    margin: 0 auto 36px auto;
   }
-  
+
   .search-input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
   }
-  
+
   .search-input {
     width: 100%;
-    padding: var(--spacing-md);
-    padding-right: 3rem;
-    margin: 0;
-    border: 2px solid var(--border);
-    border-radius: var(--radius-lg);
     background: var(--surface);
-    color: var(--text-primary);
-    font-size: 1rem;
-    transition: all 0.2s ease;
-  }
-  
-  .search-input:focus {
+    border: 1px solid var(--border-hi);
+    color: var(--text);
+    font-family: var(--font-mo);
+    font-size: 14px;
+    padding: 11px 44px 11px 16px;
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-radius: 2px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .search-input::placeholder {
+    color: var(--muted);
+  }
+
+  .search-input:focus {
+    border-color: var(--neon);
+    box-shadow: 0 0 0 1px var(--neon), 0 0 14px rgba(0, 255, 136, 0.18);
   }
 
   .search-input.open {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    border-bottom-color: transparent;
   }
-  
-  .search-input::placeholder {
-    color: var(--text-muted);
-  }
-  
+
   .search-icons {
     position: absolute;
-    right: var(--spacing-md);
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
   }
-  
+
   .search-icon {
-    color: var(--text-muted);
-    font-size: 1.125rem;
+    color: var(--neon);
+    font-size: 18px;
+    pointer-events: none;
+    text-shadow: 0 0 6px rgba(0, 255, 136, 0.6);
   }
-  
+
   .clear-button {
     background: none;
     border: none;
-    color: var(--text-muted);
-    font-size: 1.5rem;
+    color: var(--muted);
+    font-size: 1.4rem;
     cursor: pointer;
     padding: 0;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
+    border-radius: 2px;
+    transition: color 0.15s, text-shadow 0.15s;
   }
-  
+
   .clear-button:hover {
-    background: var(--surface-light);
-    color: var(--text-primary);
+    color: var(--neon);
+    text-shadow: 0 0 6px var(--neon);
   }
-  
+
   .suggestions-dropdown {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     background: var(--surface);
-    border: 2px solid var(--border);
+    border: 1px solid var(--border-hi);
     border-top: none;
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
     z-index: 1000;
-    max-height: 300px;
+    max-height: 320px;
     overflow-y: auto;
   }
 
   .suggestions-dropdown.focused {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: var(--neon);
+    box-shadow: 0 0 0 1px var(--neon), 0 0 18px rgba(0, 255, 136, 0.22);
   }
-  
+
   .suggestion-category {
-    padding: var(--spacing-sm) 0;
+    padding: 0;
   }
-  
+
   .suggestion-category:not(:last-child) {
     border-bottom: 1px solid var(--border);
   }
-  
+
   .category-header {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    background: var(--surface-light);
+    padding: 8px 16px;
+    font-family: var(--font-px);
+    font-size: 7px;
+    letter-spacing: 2px;
+    color: var(--neon);
+    background: rgba(0, 255, 136, 0.06);
   }
-  
+
   .suggestion-item {
     width: 100%;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: 10px 16px;
     border: none;
     background: none;
-    color: var(--text-primary);
+    color: var(--text);
+    font-family: var(--font-mo);
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.15s, color 0.15s;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    font-size: 13px;
   }
-  
+
   .suggestion-item:hover,
   .suggestion-item.selected {
-    background: var(--surface-light);
+    background: rgba(0, 255, 136, 0.05);
+    color: var(--cyan);
   }
-  
-  .suggestion-item.selected {
-    background: rgba(99, 102, 241, 0.1);
-    color: var(--primary-color);
-  }
-  
-  .suggestion-text {
-    font-weight: 500;
-  }
-  
+
+  .suggestion-text { font-weight: 400; }
+
   .suggestion-meta {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-style: italic;
+    font-size: 8px;
+    font-family: var(--font-px);
+    letter-spacing: 2px;
+    color: var(--muted);
   }
-  
+
   .no-suggestions {
-    padding: var(--spacing-md);
+    padding: 14px;
     text-align: center;
-    color: var(--text-muted);
+    color: var(--muted);
     font-style: italic;
   }
 
   :global(.suggestion-highlight) {
-    background: rgba(99, 102, 241, 0.2);
-    color: var(--primary-color);
-    padding: 0.125rem 0.25rem;
-    border-radius: var(--radius-sm);
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--neon);
+    padding: 0.05rem 0.2rem;
+    border-radius: 1px;
     font-weight: 600;
   }
-  
+
   @media (max-width: 480px) {
     .search-container {
       max-width: none;
-      margin-bottom: var(--spacing-md);
     }
-    
     .search-input {
-      font-size: 0.875rem;
-      padding: var(--spacing-sm);
-      padding-right: 2.5rem;
-    }
-    
-    .search-icons {
-      right: var(--spacing-sm);
-    }
-    
-    .suggestions-dropdown {
-      max-height: 250px;
+      font-size: 13px;
+      padding: 10px 40px 10px 12px;
     }
   }
 </style>

@@ -6,15 +6,29 @@
 
   let showModal = false;
   let modalImageSrc = '';
+  let modalMeta = [];
 
-  function openModal(imageSrc) {
-    modalImageSrc = imageSrc;
+  function openModal(record) {
+    modalImageSrc = correctScreenshotPath(record.screenshot);
+    const type = record.recordTypeType;
+    const valueLabel =
+      type === 'completed_at_difficulty' ? 'DIFFICULTY' :
+      (type === 'high_score' || type === 'low_score') ? 'SCORE' :
+      (type === 'fastest_time' || type === 'longest_time') ? 'TIME' :
+      'VALUE';
+    modalMeta = [
+      { label: 'GAME', value: record.gameName },
+      { label: valueLabel, value: formatRecordValue(record) },
+      { label: 'DATE', value: formatDate(record.date) },
+      { label: 'TYPE', value: record.recordTypeName },
+    ];
     showModal = true;
   }
 
   function closeModal() {
     showModal = false;
     modalImageSrc = '';
+    modalMeta = [];
   }
 
   function correctScreenshotPath(path) {
@@ -25,10 +39,10 @@
 
   function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   }
 
@@ -38,76 +52,53 @@
     if (record.difficulty) return record.difficulty;
     return 'Completed';
   }
-
-  function getRecordTypeIcon(recordType) {
-    if (recordType === 'fastest_time') return '⏱️';
-    if (recordType === 'high_score') return '🏆';
-    if (recordType === 'low_score') return '📈';
-    if (recordType === 'completed_at_difficulty') return '✅';
-    return '🎮';
-  }
 </script>
 
 <main>
   <div class="breadcrumb">
-    <Link to="{$basePath}/" class="back-link">
-      <span>←</span> Back to Games
+    <Link to="{$basePath}/" class="back-btn">
+      ← BACK TO GAMES
     </Link>
   </div>
 
-  <div class="page-header">
-    <h1>Recent Records</h1>
-    <p class="page-subtitle">The 10 most recently achieved records</p>
-  </div>
+  <h1>◆ RECENT RECORDS</h1>
+  <p class="page-sub">THE 10 MOST RECENTLY ACHIEVED RECORDS</p>
 
   {#if $recentRecords.length === 0}
     <div class="empty-state">
       <p>No recent records found.</p>
-      <Link to="{$basePath}/" class="back-home-link">Browse Games</Link>
+      <Link to="{$basePath}/" class="back-home-link">BROWSE GAMES</Link>
     </div>
   {:else}
-    <div class="records-grid">
+    <div class="recent-grid">
       {#each $recentRecords as record, index}
-        <div class="record-card">
-          <div class="record-header">
-            <div class="record-rank">#{index + 1}</div>
-            <div class="record-date">{formatDate(record.date)}</div>
+        <div class="rc">
+          <div class="rc-head">
+            <span class="rc-rank">#{String(index + 1).padStart(2, '0')}</span>
+            <span class="rc-date">{formatDate(record.date)}</span>
           </div>
-          
-          <div class="record-content">
-            <div class="record-main">
-              <div class="game-info">
-                <h3 class="game-name">
-                  <Link to="{$basePath}/game/{record.gameSlug}" class="game-link">
-                    {record.gameName}
-                  </Link>
-                </h3>
-                <div class="record-type">
-                  <span class="record-icon">{getRecordTypeIcon(record.recordTypeType)}</span>
-                  {record.recordTypeName}
-                </div>
-              </div>
-              
-              <div class="record-value">
-                <span class="value">{formatRecordValue(record)}</span>
-              </div>
+          <div class="rc-body">
+            <div class="rc-top">
+              <Link to="{$basePath}/game/{record.gameSlug}" class="rc-game">
+                {record.gameName}
+              </Link>
+              <span class="rc-val">{formatRecordValue(record)}</span>
             </div>
-            
+            <div class="rc-type">
+              <span class="rc-type-icon">▸</span>
+              <span>{record.recordTypeName}</span>
+            </div>
             {#if record.description}
-              <div class="record-description">
-                <p>{record.description}</p>
-              </div>
+              <div class="rc-note">{record.description}</div>
             {/if}
-            
             {#if record.screenshot}
-              <div class="screenshot-section">
-                <button 
-                  class="screenshot-btn"
-                  on:click={() => openModal(correctScreenshotPath(record.screenshot))}
+              <div class="rc-foot">
+                <button
+                  class="ss-btn"
+                  on:click={() => openModal(record)}
                   type="button"
                 >
-                  <span>📷</span>
-                  View Screenshot
+                  ◈ VIEW SCREENSHOT
                 </button>
               </div>
             {/if}
@@ -117,262 +108,182 @@
     </div>
   {/if}
 
-  <Modal 
-    isVisible={showModal} 
-    imgSrc={modalImageSrc} 
-    onClose={closeModal} 
+  <Modal
+    isVisible={showModal}
+    imgSrc={modalImageSrc}
+    meta={modalMeta}
+    onClose={closeModal}
   />
 </main>
 
 <style>
-  /* Breadcrumb Navigation */
-  .breadcrumb {
-    margin-bottom: var(--spacing-lg);
-  }
+  .breadcrumb { margin-bottom: 28px; }
 
-  :global(.back-link) {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-weight: 500;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-    background: var(--surface);
-    border: 1px solid var(--border);
-  }
-
-  :global(.back-link:hover) {
-    color: var(--primary-color);
-    background: rgba(99, 102, 241, 0.05);
-    text-decoration: none;
-    transform: translateX(-2px);
-  }
-
-  :global(.back-link span) {
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-
-  /* Page Header */
-  .page-header {
+  .page-sub {
     text-align: center;
-    margin-bottom: var(--spacing-2xl);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 32px;
+    margin-top: -16px;
   }
 
-  .page-subtitle {
-    color: var(--text-secondary);
-    font-size: 1.125rem;
-    margin-top: var(--spacing-sm);
-  }
-
-  /* Empty State */
   .empty-state {
     text-align: center;
     margin: var(--spacing-2xl) 0;
     padding: var(--spacing-2xl);
     background: var(--surface);
-    border-radius: var(--radius-lg);
-    border: 2px dashed var(--border);
+    border: 1px dashed var(--border-hi);
+    border-radius: 2px;
   }
-
   .empty-state p {
-    color: var(--text-secondary);
+    color: var(--muted);
     margin-bottom: var(--spacing-lg);
-    font-size: 1.125rem;
+    font-size: 13px;
   }
 
   :global(.back-home-link) {
     display: inline-block;
-    background: var(--primary-color);
-    color: white;
-    text-decoration: none;
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    transition: all 0.2s ease;
-  }
-
-  :global(.back-home-link:hover) {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-glow);
-    text-decoration: none;
-  }
-
-  /* Records Grid */
-  .records-grid {
-    display: grid;
-    gap: var(--spacing-lg);
-    grid-template-columns: 1fr;
-  }
-
-  .record-card {
     background: var(--surface);
-    border-radius: var(--radius-lg);
+    color: var(--neon);
+    border: 1px solid var(--neon);
+    padding: 10px 20px;
+    font-family: var(--font-mo);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  :global(.back-home-link:hover) {
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 16px rgba(0, 255, 136, 0.3);
+    text-decoration: none;
+  }
+
+  .recent-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .rc {
+    background: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
+    border-radius: 2px;
     overflow: hidden;
-    transition: all 0.2s ease;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  .rc:hover {
+    border-color: var(--border-hi);
+    box-shadow: 0 0 18px rgba(0, 255, 136, 0.07);
   }
 
-  .record-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .record-header {
+  .rc-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    color: white;
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 255, 136, 0.045);
+  }
+  .rc-rank {
+    font-family: var(--font-px);
+    font-size: 10px;
+    color: var(--neon);
+    letter-spacing: 1px;
+  }
+  .rc-date {
+    font-family: var(--font-mo);
+    font-size: 11px;
+    color: var(--muted);
   }
 
-  .record-rank {
-    font-weight: 800;
-    font-size: 1.125rem;
-  }
+  .rc-body { padding: 14px 16px; }
 
-  .record-date {
-    font-size: 0.875rem;
-    opacity: 0.9;
-  }
-
-  .record-content {
-    padding: var(--spacing-lg);
-  }
-
-  .record-main {
+  .rc-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 5px;
+    gap: 10px;
   }
 
-  .game-info {
-    flex: 1;
-  }
-
-  .game-name {
-    margin: 0 0 var(--spacing-sm) 0;
-    font-size: 1.25rem;
-  }
-
-  :global(.game-link) {
-    color: var(--text-primary);
+  :global(.rc-game) {
+    font-family: var(--font-mo);
+    font-size: 15px;
+    color: var(--cyan);
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: text-shadow 0.15s;
+    flex: 1;
+    min-width: 0;
+  }
+  :global(.rc-game:hover) {
+    text-shadow: 0 0 8px var(--cyan);
+    text-decoration: none;
   }
 
-  :global(.game-link:hover) {
-    color: var(--primary-color);
-    text-decoration: underline;
+  .rc-val {
+    font-family: var(--font-px);
+    font-size: 12px;
+    color: var(--neon);
+    text-shadow: 0 0 8px var(--neon);
+    white-space: nowrap;
+    margin-left: 10px;
+    flex-shrink: 0;
   }
 
-  .record-type {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    font-weight: 500;
+  .rc-type {
+    font-family: var(--font-mo);
+    font-size: 10px;
+    color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .record-icon {
-    font-size: 1rem;
-  }
-
-  .record-value {
-    text-align: right;
-  }
-
-  .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--success-color), #059669);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .record-description {
-    margin-bottom: var(--spacing-md);
-    padding: var(--spacing-md);
-    background: var(--surface-light);
-    border-radius: var(--radius-md);
-    border-left: 4px solid var(--primary-color);
-  }
-
-  .record-description p {
-    margin: 0;
-    color: var(--text-secondary);
-    font-style: italic;
-  }
-
-  .screenshot-section {
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    line-height: 1.4;
     display: flex;
-    justify-content: center;
+    gap: 6px;
+  }
+  .rc-type-icon {
+    color: var(--purple);
+    flex-shrink: 0;
   }
 
-  .screenshot-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    background: var(--surface-light);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
+  .rc-note {
+    font-family: var(--font-mo);
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.55;
+    background: var(--surface2);
+    border-left: 2px solid var(--border-hi);
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .rc-foot {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .ss-btn {
+    background: rgba(153, 102, 255, 0.1);
+    border: 1px solid rgba(153, 102, 255, 0.5);
+    color: var(--purple);
+    font-family: var(--font-mo);
+    font-size: 11px;
+    padding: 5px 10px;
     cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+  .ss-btn:hover {
+    background: rgba(153, 102, 255, 0.22);
+    box-shadow: 0 0 8px rgba(153, 102, 255, 0.3);
   }
 
-  .screenshot-btn:hover {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-    transform: translateY(-1px);
-  }
-
-  .screenshot-btn span {
-    font-size: 1rem;
-  }
-
-  /* Responsive Design */
-  @media (min-width: 768px) {
-    .records-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .record-main {
-      flex-direction: column;
-      gap: var(--spacing-sm);
-    }
-
-    .record-value {
-      text-align: left;
-    }
-
-    .value {
-      font-size: 1.25rem;
-    }
-
-    .record-header {
-      padding: var(--spacing-sm) var(--spacing-md);
-    }
-
-    .record-content {
-      padding: var(--spacing-md);
-    }
+  @media (max-width: 720px) {
+    .recent-grid { grid-template-columns: 1fr; }
   }
 </style>

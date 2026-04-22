@@ -10,6 +10,7 @@
   
     let showModal = false; // State to control the visibility of the modal
     let modalImageSrc = ''; // State to hold the current image src for the modal
+    let modalMeta = [];
     let expandedDescriptions = new Set(); // Track which record descriptions are expanded
 
     const recordTypeMap = {
@@ -19,11 +20,25 @@
       "fastest_time": "Time",
       "longest_time": "Time"
     };
-  
+
     const recordTypeToValue = (type) => recordTypeMap[type] || "";
 
-    const showScreenshotModal = (screenshotPath) => {
-        modalImageSrc = correctScreenshotPath(screenshotPath);
+    function recordValue(record, type) {
+      if (type === 'completed_at_difficulty') return record.difficulty;
+      if (type === 'high_score' || type === 'low_score') return record.score;
+      if (type === 'fastest_time' || type === 'longest_time') return record.time;
+      return record.difficulty || record.score || record.time;
+    }
+
+    const showScreenshotModal = (record) => {
+        modalImageSrc = correctScreenshotPath(record.screenshot);
+        const valueLabel = (recordTypeToValue(recordType.type) || 'VALUE').toUpperCase();
+        modalMeta = [
+          { label: 'GAME', value: gameData?.name },
+          { label: valueLabel, value: recordValue(record, recordType.type) },
+          { label: 'DATE', value: record.date },
+          { label: 'TYPE', value: recordType.name },
+        ];
         showModal = true;
     };
 
@@ -223,19 +238,21 @@
     ];
 </script>
   
-  <div class="record-header">
-    <h2>{recordType.name}</h2>
-    {#if recordType.description}
-      <p class="description">{recordType.description}</p>
-    {/if}
-    <div class="record-count">
-      <span class="count-number">{recordType.records.length}</span>
-      <span class="count-label">{recordType.records.length === 1 ? 'record' : 'records'}</span>
+  <div class="rec-group-head">
+    <div class="rec-group-text">
+      <h2 class="rec-group-title">{recordType.name}</h2>
+      {#if recordType.description}
+        <p class="rec-group-desc">{recordType.description}</p>
+      {/if}
+    </div>
+    <div class="rec-badge">
+      {recordType.records.length}
+      <span>{recordType.records.length === 1 ? 'RECORD' : 'RECORDS'}</span>
     </div>
   </div>
 
-  <div class="table-container">
-    <SortableTable 
+  <div class="rec-table">
+    <SortableTable
       data={tableData}
       {columns}
       {gameData}
@@ -251,97 +268,84 @@
       </div>
     </SortableTable>
   </div>
-  
-  <Modal isVisible={showModal} imgSrc={modalImageSrc} onClose={closeModal}/>
+
+  <Modal isVisible={showModal} imgSrc={modalImageSrc} meta={modalMeta} onClose={closeModal}/>
 
   <style>
-    /* Record Header */
-    .record-header {
+    .rec-group-head {
       display: flex;
-      flex-direction: column;
-      gap: var(--spacing-sm);
-      margin-bottom: var(--spacing-lg);
-      position: relative;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .record-header h2 {
+    .rec-group-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rec-group-title {
+      font-family: var(--font-px);
+      font-size: 10px;
+      color: var(--text);
+      letter-spacing: 1px;
+      margin: 0 0 6px 0;
+      line-height: 1.8;
+    }
+
+    .rec-group-desc {
+      font-family: var(--font-mo);
+      font-size: 12px;
+      color: var(--muted);
       margin: 0;
-      color: var(--text-primary);
-      border: none;
-      padding: 0;
-    }
-
-    .description {
-      color: var(--text-secondary);
-      font-style: italic;
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-
-    .record-count {
-      position: absolute;
-      top: 0;
-      right: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--primary-color);
-      color: white;
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--radius-lg);
-      font-size: 0.875rem;
-      font-weight: 600;
-      box-shadow: var(--shadow-md);
-    }
-
-    .count-number {
-      font-size: 1.25rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .count-label {
-      font-size: 0.75rem;
-      opacity: 0.9;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Table Container */
-    .table-container {
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    /* Description content (shown in expanded rows) */
-    .description-content {
-      color: var(--text-secondary);
-      font-style: italic;
       line-height: 1.5;
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .record-count {
-        position: static;
-        align-self: flex-start;
-        margin-top: var(--spacing-sm);
-      }
+    .rec-badge {
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      font-family: var(--font-px);
+      font-size: 16px;
+      padding: 10px 14px;
+      border-radius: 2px;
+      text-align: center;
+      min-width: 64px;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.18);
+      flex-shrink: 0;
+      line-height: 1.2;
     }
 
-    @media (max-width: 480px) {
-      .record-header {
-        text-align: center;
-      }
+    .rec-badge span {
+      display: block;
+      font-size: 7px;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: 2px;
+    }
 
-      .record-count {
-        align-self: center;
-      }
+    .rec-table {
+      /* The SortableTable wrapper already gets its own border; let the group card frame it. */
+    }
 
-      :global(.expanded-content .description-content) {
-        font-size: 0.875rem;
-      }
+    /* Strip the inner table wrapper border — the outer group card already frames it. */
+    .rec-table :global(.tbl-wrap) {
+      border: none;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .description-content {
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .rec-group-head { flex-direction: column; align-items: flex-start; }
+      .rec-badge { align-self: flex-start; }
     }
   </style>

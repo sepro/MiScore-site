@@ -152,42 +152,28 @@
 
 <style>
   .value-cell {
-    position: relative;
-    font-weight: 600;
-    font-size: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mo);
   }
 
   .record-value {
-    color: var(--primary-color);
-    font-weight: 700;
+    color: var(--cyan);
+    font-size: 14px;
   }
 
   .best-badge {
-    position: absolute;
-    right: var(--spacing-sm);
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--success-color);
-    color: white;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    box-shadow: var(--shadow-sm);
-    height: 28px;
-    display: flex;
-    align-items: center;
-  }
-
-  /* Mobile responsive adjustments */
-  @media (max-width: 768px) {
-    .best-badge {
-      position: static;
-      transform: none;
-      margin-left: var(--spacing-sm);
-      display: inline-block;
-    }
+    background: rgba(153, 102, 255, 0.13);
+    border: 1px solid var(--purple);
+    color: var(--purple);
+    font-family: var(--font-px);
+    font-size: 7px;
+    padding: 3px 6px;
+    border-radius: 1px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 6px var(--purple);
+    box-shadow: 0 0 5px rgba(153, 102, 255, 0.18);
+    white-space: nowrap;
   }
 </style>

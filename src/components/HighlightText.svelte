@@ -34,10 +34,11 @@
 
 <style>
   :global(.highlight) {
-    background: linear-gradient(135deg, var(--warning-color), #fbbf24);
-    color: var(--background);
-    padding: 0.125rem 0.25rem;
-    border-radius: var(--radius-sm);
+    background: rgba(255, 170, 0, 0.18);
+    color: var(--amber);
+    padding: 0.05rem 0.2rem;
+    border-radius: 1px;
     font-weight: 600;
+    text-shadow: 0 0 6px rgba(255, 170, 0, 0.4);
   }
 </style>

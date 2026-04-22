@@ -4,6 +4,7 @@
     export let isVisible = false;
     export let imgSrc = '';
     export let onClose;
+    export let meta = []; // Array of { label, value } pairs rendered below the image.
 
     let modalElement;
     let portal;
@@ -63,8 +64,8 @@
   {#if isVisible}
   <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-  <div 
-    class="modal" 
+  <div
+    class="modal"
     bind:this={modalElement}
     on:click={handleBackdropClick}
     on:keydown={handleBackdropKeydown}
@@ -74,114 +75,118 @@
     tabindex="0"
   >
     <div class="modal-content">
-      <button 
-        class="close" 
-        on:click={onClose}
-        aria-label="Close modal"
-        type="button"
-      >
-        &times;
-      </button>
+      <div class="modal-top">
+        <span class="modal-ttl">◆ SCREENSHOT VIEWER</span>
+        <button
+          class="close"
+          on:click={onClose}
+          aria-label="Close modal"
+          type="button"
+        >✕</button>
+      </div>
       <div class="screenshot-wrapper">
         <img src={imgSrc} alt="Screenshot" class="screenshot" />
       </div>
+      {#if meta && meta.length > 0}
+        <div class="modal-meta-row">
+          {#each meta as item}
+            <div class="modal-meta-item">
+              <span class="modal-meta-lbl">{item.label}</span>
+              <span class="modal-meta-val">{item.value || '—'}</span>
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
   </div>
   {/if}
   
   <style>
     .modal {
-      /* Force positioning relative to viewport */
       position: fixed;
-      inset: 0; /* Shorthand for top: 0, right: 0, bottom: 0, left: 0 */
+      inset: 0;
       z-index: 10000;
-      
-      /* Full viewport coverage */
       width: 100vw;
       height: 100vh;
-      
-      /* Center the content */
       display: flex;
       justify-content: center;
       align-items: center;
-      
-      /* Styling */
-      background-color: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(4px);
-      
-      /* Prevent scrolling issues */
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(5px);
       overflow: auto;
-      
-      /* Animation */
-      animation: modalFadeIn 0.2s ease-out;
+      padding: 24px;
+      animation: modalFadeIn 0.18s ease both;
     }
 
     @keyframes modalFadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
 
     .modal-content {
       background: var(--surface);
-      padding: var(--spacing-xl);
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--border);
-      max-width: min(95vw, 1200px);
+      border: 1px solid var(--border-hi);
+      border-radius: 2px;
+      width: 100%;
+      max-width: 900px;
       max-height: 90vh;
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 0 50px rgba(0, 255, 136, 0.12);
       position: relative;
       overflow: auto;
-      animation: modalSlideIn 0.3s ease-out;
+      animation: modalSlideIn 0.2s ease both;
     }
 
     @keyframes modalSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { transform: translateY(12px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    .modal-ttl {
+      font-family: var(--font-px);
+      font-size: 9px;
+      color: var(--neon);
+      letter-spacing: 2px;
     }
 
     .close {
-      position: absolute;
-      top: var(--spacing-md);
-      right: var(--spacing-md);
-      color: var(--text-secondary);
-      font-size: 2rem;
-      font-weight: bold;
+      background: none;
+      border: 1px solid var(--border-hi);
+      color: var(--muted);
+      width: 28px;
+      height: 28px;
       cursor: pointer;
-      z-index: 10;
-      background: var(--surface-light);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
-      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: var(--font-mo);
+      transition: all 0.15s;
+      padding: 0;
     }
 
     .close:hover,
     .close:focus {
-      color: var(--text-primary);
-      background: var(--primary-color);
-      transform: scale(1.1);
-      box-shadow: var(--shadow-glow);
+      border-color: var(--neon);
+      color: var(--neon);
+      text-shadow: 0 0 6px var(--neon);
+      outline: none;
     }
 
     .screenshot-wrapper {
       display: flex;
       justify-content: center;
+      padding: 0;
+      background: #040408;
     }
 
     .screenshot {
@@ -191,23 +196,46 @@
       height: auto;
     }
 
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .modal-content {
-        width: 100%;
-        height: 100%;
-        max-height: 100vh;
-        border-radius: 0;
-        padding: var(--spacing-lg);
-      }
+    .modal-meta-row {
+      display: flex;
+      border-top: 1px solid var(--border);
+    }
+    .modal-meta-item {
+      flex: 1;
+      padding: 13px 18px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .modal-meta-item:last-child { border-right: none; }
+    .modal-meta-lbl {
+      font-family: var(--font-px);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
+    .modal-meta-val {
+      font-family: var(--font-mo);
+      font-size: 13px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .close {
-        top: var(--spacing-sm);
-        right: var(--spacing-sm);
-        font-size: 1.5rem;
-        width: 36px;
-        height: 36px;
+    @media (max-width: 600px) {
+      .modal { padding: 12px; }
+      .modal-top { padding: 10px 14px; }
+      .modal-ttl { font-size: 8px; }
+      .modal-meta-row { flex-wrap: wrap; }
+      .modal-meta-item {
+        flex: 1 1 50%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
       }
+      .modal-meta-item:nth-child(odd) { border-right: 1px solid var(--border); }
+      .modal-meta-item:nth-last-child(-n+2) { border-bottom: none; }
     }
   </style>
   

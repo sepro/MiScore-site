@@ -6,8 +6,9 @@
 
 <style>
   .date-value {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    font-weight: 500;
+    color: var(--text);
+    font-family: var(--font-mo);
+    font-size: 13px;
+    letter-spacing: 0.5px;
   }
 </style>

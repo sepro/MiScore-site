@@ -1,307 +1,148 @@
-/* Modern CSS Reset and Base Styles */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Retro CRT / Arcade theme — tokens (duplicated for Svelte bundle scoping) and
+   shared base styles. Background layers live in public/global.css. */
 
-/* CSS Variables for Gaming Theme */
 :root {
-  /* Gaming-inspired color palette */
-  --primary-color: #6366f1; /* Indigo for gaming feel */
-  --primary-dark: #4f46e5;
-  --secondary-color: #8b5cf6; /* Purple accent */
-  --success-color: #10b981; /* Green for achievements */
-  --warning-color: #f59e0b; /* Amber for alerts */
-  --danger-color: #ef4444; /* Red for errors */
-  
-  /* Neutral colors */
-  --background: #0f172a; /* Dark slate background */
-  --surface: #1e293b; /* Lighter dark surface */
-  --surface-light: #334155; /* Even lighter surface */
-  --text-primary: #f1f5f9; /* Light text */
-  --text-secondary: #cbd5e1; /* Muted text */
-  --text-muted: #94a3b8; /* Very muted text */
-  --border: #374151; /* Border color */
-  --border-light: #4b5563; /* Lighter border */
-  
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  
-  /* Border radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 20px rgb(99 102 241 / 0.3);
-}
+  --neon: #00ff88;
+  --cyan: #00d4ff;
+  --amber: #ffaa00;
+  --purple: #9966ff;
+  --danger: #ff4466;
 
-/* Body and HTML */
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-}
+  --bg: #06060e;
+  --surface: #0b0b18;
+  --surface2: #111124;
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--background);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
+  --border: rgba(0, 255, 136, 0.10);
+  --border-hi: rgba(0, 255, 136, 0.32);
+
+  --text: #bcc8e0;
+  --text-primary: #bcc8e0;
+  --text-secondary: #8692b0;
+  --text-muted: #48506a;
+  --muted: #48506a;
+
+  --font-px: 'Press Start 2P', monospace;
+  --font-mo: 'Share Tech Mono', monospace;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 14px;
+  --spacing-lg: 20px;
+  --spacing-xl: 28px;
+  --spacing-2xl: 44px;
+
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+
+  --shadow-sm: 0 0 4px rgba(0, 255, 136, 0.15);
+  --shadow-md: 0 0 10px rgba(0, 255, 136, 0.18);
+  --shadow-lg: 0 0 22px rgba(0, 255, 136, 0.22);
+  --shadow-glow: 0 0 12px rgba(0, 255, 136, 0.45);
 }
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: var(--spacing-md);
+  font-family: var(--font-px);
   color: var(--text-primary);
+  line-height: 1.3;
+  letter-spacing: 1.5px;
 }
-
 h1 {
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 16px;
+  color: var(--neon);
   text-align: center;
+  text-shadow: 0 0 10px var(--neon), 0 0 30px rgba(0, 255, 136, 0.3);
   margin-bottom: var(--spacing-xl);
+  letter-spacing: 2px;
 }
-
 h2 {
-  font-size: 1.75rem;
-  color: var(--primary-color);
-  border-left: 4px solid var(--primary-color);
-  padding-left: var(--spacing-md);
-  margin-top: var(--spacing-xl);
+  font-size: 10px;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  line-height: 1.8;
 }
-
 h3 {
-  font-size: 1.25rem;
+  font-size: 12px;
   color: var(--text-primary);
 }
 
-/* Main Layout */
+/* Main layout */
 main {
-  width: 100%;
-  max-width: 1200px;
+  position: relative;
+  z-index: 2;
+  max-width: 980px;
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-md);
-  min-height: calc(100vh - 80px); /* Account for nav height */
+  padding: 44px 28px 90px;
+  animation: pgIn 0.22s ease both;
 }
-
-/* Tables */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: var(--spacing-xl);
-}
-
-th, td {
-  padding: var(--spacing-md);
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-
-th {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  color: white;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.875rem;
-}
-
-th:last-child {
-  text-align: right;
-}
-
-td:last-child {
-  text-align: right;
-  font-weight: 600;
-  color: var(--primary-color);
-}
-
-tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-tbody tr:hover {
-  background: var(--surface-light);
-}
-
-tbody tr:last-child td {
-  border-bottom: none;
+@keyframes pgIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Links */
 a {
-  color: var(--primary-color);
+  color: var(--cyan);
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
+  transition: color 0.15s, text-shadow 0.15s;
 }
-
-a:visited {
-  color: var(--primary-color);
-}
-
 a:hover {
-  color: var(--secondary-color);
-  text-decoration: underline;
+  color: var(--cyan);
+  text-shadow: 0 0 6px var(--cyan);
+  text-decoration: none;
 }
+a:visited { color: var(--cyan); }
 
-a:visited:hover {
-  color: var(--secondary-color);
+/* Form elements reset */
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
 }
-
-/* Buttons */
 button {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  color: white;
-  border: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  transition: all 0.15s;
 }
+button:disabled { opacity: 0.3; cursor: default; }
 
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-glow);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Loading States */
+/* Loading spinner */
 .loading {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 200px;
-  font-size: 1.25rem;
-  color: var(--text-secondary);
+  min-height: 60vh;
+  gap: var(--spacing-lg);
+  color: var(--muted);
+  font-family: var(--font-mo);
+  letter-spacing: 1px;
+}
+.loading p {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.loading-spinner {
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--border);
+  border-top-color: var(--neon);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Screenshot Modal */
-div.screenshot-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: var(--spacing-md);
-}
-
-img.screenshot {
-  max-height: 80vh;
-  max-width: 90vw;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  main {
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-  
-  h2 {
-    font-size: 1.5rem;
-  }
-  
-  table {
-    font-size: 0.875rem;
-  }
-  
-  th, td {
-    padding: var(--spacing-sm);
-  }
-  
-  /* Hide record count column on games overview table for very small screens */
-  @media (max-width: 480px) {
-    .games-overview-table th:last-child,
-    .games-overview-table td:last-child {
-      display: none;
-    }
-  }
-  
-  /* Stack table cells on very small screens (for other tables like records table) */
-  @media (max-width: 480px) {
-    table:not(.games-overview-table), 
-    table:not(.games-overview-table) thead, 
-    table:not(.games-overview-table) tbody, 
-    table:not(.games-overview-table) th, 
-    table:not(.games-overview-table) td, 
-    table:not(.games-overview-table) tr {
-      display: block;
-    }
-    
-    table:not(.games-overview-table) thead tr {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-    }
-    
-    table:not(.games-overview-table) tr {
-      border: 1px solid var(--border);
-      margin-bottom: var(--spacing-md);
-      border-radius: var(--radius-md);
-      background: var(--surface);
-    }
-    
-    table:not(.games-overview-table) td {
-      border: none;
-      position: relative;
-      padding-left: 50% !important;
-      text-align: left !important;
-    }
-    
-    table:not(.games-overview-table) td:before {
-      content: attr(data-label);
-      position: absolute;
-      left: var(--spacing-md);
-      width: 45%;
-      padding-right: var(--spacing-sm);
-      white-space: nowrap;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-  }
-}
-
-/* Utility Classes */
+/* Utility classes */
 .text-center { text-align: center; }
 .text-muted { color: var(--text-muted); }
-.mb-0 { margin-bottom: 0; }
-.mb-sm { margin-bottom: var(--spacing-sm); }
-.mb-md { margin-bottom: var(--spacing-md); }
-.mb-lg { margin-bottom: var(--spacing-lg); }

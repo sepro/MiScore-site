@@ -20,6 +20,20 @@
     opacity.set(chars.map(() => 1));
   }
 
+  // Group chars into word/space segments to prevent mid-word line breaks
+  $: segments = (() => {
+    const result = [];
+    let idx = 0;
+    for (const token of text.split(/(\s+)/)) {
+      if (!token) continue;
+      result.push({
+        isSpace: /^\s+$/.test(token),
+        chars: token.split('').map(char => ({ char, idx: idx++ }))
+      });
+    }
+    return result;
+  })();
+
   const setOpacity = (idx, v) => {
     opacity.update(s => {
       if (idx < 0 || idx >= s.length) return s;
@@ -120,11 +134,18 @@
 </script>
 
 <svelte:element this={tag} class={className} aria-label={text}>
-  {#each chars as char, i (i)}
-    <span
-      class:space={char === ' '}
-      style="opacity:{$opacity[i] ?? 1}"
-    >{char}</span>
+  {#each segments as seg}
+    {#if seg.isSpace}
+      {#each seg.chars as {char, idx}}
+        <span class="space" style="opacity:{$opacity[idx] ?? 1}">{char}</span>
+      {/each}
+    {:else}
+      <span class="word">
+        {#each seg.chars as {char, idx}}
+          <span style="opacity:{$opacity[idx] ?? 1}">{char}</span>
+        {/each}
+      </span>
+    {/if}
   {/each}
 </svelte:element>
 
@@ -135,5 +156,8 @@
   }
   span.space {
     white-space: pre;
+  }
+  span.word {
+    white-space: nowrap;
   }
 </style>

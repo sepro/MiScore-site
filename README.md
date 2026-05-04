@@ -17,6 +17,27 @@ If you need to update the data, please run
 git submodule foreach git pull origin main
 ```
 
+### Committing data changes to the submodule
+
+If you've edited the data inside `public/records` and want to publish those changes, commit and push them from inside the submodule first, then update the parent repository to point at the new submodule commit:
+
+```bash
+# 1. Commit and push the data changes in the submodule
+cd public/records
+git add .
+git commit -m "Update records data"
+git push origin main
+
+# 2. Record the new submodule commit in the parent repo
+cd ../..
+git add public/records
+git commit -m "Update records submodule"
+git push origin main
+
+# 3. Rebuild the website with the updated data
+npm run build
+```
+
 ...then start [Rollup](https://rollupjs.org):
 
 ```bash

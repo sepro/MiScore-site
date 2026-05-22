@@ -94,6 +94,28 @@
   };
 </script>
 
+<div class="mobile-sort" aria-label="Sort records">
+  <label class="mobile-sort-label" for="mobile-sort-select">Sort by</label>
+  <select
+    id="mobile-sort-select"
+    class="mobile-sort-select"
+    value={sortColumn}
+    on:change={(e) => handleSort(e.currentTarget.value)}
+  >
+    {#each columns.filter(c => c.sortable !== false) as column}
+      <option value={column.key}>{column.label}</option>
+    {/each}
+  </select>
+  <button
+    type="button"
+    class="mobile-sort-dir"
+    aria-label="Toggle sort direction"
+    on:click={() => handleSort(sortColumn)}
+  >
+    {sortDirection === 'asc' ? '↓' : '↑'}
+  </button>
+</div>
+
 <div class="tbl-wrap">
   <table class="sortable-table {tableClass}">
     <thead>
@@ -219,8 +241,108 @@
     line-height: 1.6;
   }
 
+  .mobile-sort { display: none; }
+
   @media (max-width: 600px) {
-    .sortable-header { padding: 10px 12px; font-size: 7px; }
-    tbody td { padding: 11px 12px; font-size: 13px; }
+    .mobile-sort {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 14px;
+      font-family: var(--font-px);
+    }
+    .mobile-sort-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: var(--neon);
+      text-transform: uppercase;
+    }
+    .mobile-sort-select {
+      flex: 1;
+      min-width: 0;
+      height: 36px;
+      box-sizing: border-box;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border-hi);
+      border-radius: 2px;
+      padding: 0 10px;
+      font-family: var(--font-mo);
+      font-size: 13px;
+      line-height: 1;
+    }
+    .mobile-sort-dir {
+      height: 36px;
+      box-sizing: border-box;
+      background: var(--surface);
+      color: var(--neon);
+      border: 1px solid var(--border-hi);
+      border-radius: 2px;
+      padding: 0 12px;
+      font-family: var(--font-mo);
+      font-size: 14px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .mobile-sort-dir:hover { background: rgba(0, 255, 136, 0.07); }
+
+    .tbl-wrap {
+      border: none;
+      background: transparent;
+      overflow: visible;
+    }
+    .sortable-table { display: block; }
+    thead { display: none; }
+    tbody { display: block; }
+    tbody tr {
+      display: block;
+      border: 1px solid var(--border-hi);
+      border-radius: 2px;
+      background: var(--surface);
+      margin-bottom: 10px;
+      padding: 4px 0;
+    }
+    tbody tr:hover { background: var(--surface); }
+    tbody tr:last-child { border-bottom: 1px solid var(--border-hi); margin-bottom: 0; }
+    tbody td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 14px;
+      font-size: 13px;
+      text-align: right;
+      border-bottom: 1px dashed rgba(0, 255, 136, 0.08);
+    }
+    tbody tr td:last-child { border-bottom: none; }
+    tbody td::before {
+      content: attr(data-label);
+      font-family: var(--font-px);
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: var(--neon);
+      text-transform: uppercase;
+      flex-shrink: 0;
+      text-align: left;
+    }
+    .expanded-row {
+      display: block;
+      border: 1px solid var(--border-hi);
+      border-top: none;
+      border-radius: 0 0 2px 2px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      background: rgba(0, 255, 136, 0.025);
+    }
+    .expanded-content {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    .expanded-content::before { content: none; }
   }
 </style>

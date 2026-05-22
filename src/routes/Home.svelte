@@ -143,4 +143,15 @@
   :global(.games-overview-table tbody tr:hover) {
     box-shadow: inset 3px 0 0 var(--neon), inset 3px 0 12px rgba(0, 255, 136, 0.4);
   }
+
+  /* Make the entire row clickable by stretching the game-name link to cover it */
+  :global(.games-overview-table tbody tr) {
+    position: relative;
+  }
+  :global(.games-overview-table tbody tr .game-name-link::after) {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
 </style>
